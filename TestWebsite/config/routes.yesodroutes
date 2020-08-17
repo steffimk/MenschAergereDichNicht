@@ -9,3 +9,5 @@
 / HomeR GET POST
 
 /comments CommentR POST
+
+/lobby_creation LobbyCreationR POST

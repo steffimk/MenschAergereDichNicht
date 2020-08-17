@@ -11,3 +11,8 @@ li {
     width: 400px;
     height: 100px;
 }
+
+##{lobbynameTextareaId} {
+    width: 400px;
+    height: 100px;
+}

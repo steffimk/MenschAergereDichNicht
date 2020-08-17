@@ -29,6 +29,7 @@ getHomeR = do
         handlerName = "getHomeR" :: Text
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
+            (lobbyFormId, lobbynameTextareaId, lobbyListId) = lobbyIds
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
@@ -43,6 +44,7 @@ postHomeR = do
 
     defaultLayout $ do
         let (commentFormId, commentTextareaId, commentListId) = commentIds
+            (lobbyFormId, lobbynameTextareaId, lobbyListId) = lobbyIds
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
@@ -65,3 +67,6 @@ sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
 
 commentIds :: (Text, Text, Text)
 commentIds = ("js-commentForm", "js-createCommentTextarea", "js-commentList")
+
+lobbyIds :: (Text, Text, Text)
+lobbyIds = ("js-lobbyForm", "js-createLobbynameTextarea", "js-lobbyList")

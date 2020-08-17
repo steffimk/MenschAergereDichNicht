@@ -119,6 +119,22 @@
                        console log to see the raw response from the server.
                    <ul ##{commentListId}>
 
+        <div .row>
+            <div .col-lg-6>
+                <div .bs-callout.bs-callout-info.well>
+                    <form .form-horizontal ##{lobbyFormId}>
+                        <div .field>
+                            <textarea rows="2" ##{lobbynameTextareaId} placeholder="Your lobbyname here..." required></textarea>
+
+                        <button .btn.btn-primary type=submit>
+                           Create new lobby
+
+           <div .col-lg-4.col-lg-offset-1>
+               <div .bs-callout.bs-callout-info>
+                   <small>
+                       Currently open lobbies:
+                   <ul ##{lobbyListId}>
+
     <hr>
 
     <!-- Testing

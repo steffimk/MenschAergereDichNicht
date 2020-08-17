@@ -32,3 +32,33 @@ $(function() {
 
   });
 });
+
+$(function() {
+  $("##{rawJS lobbyFormId}").submit(function(event) {
+    event.preventDefault();
+
+    var lobbyname = $("##{rawJS lobbynameTextareaId}").val();
+    if (!lobbyname) {
+      alert("Please enter a lobbyname first.")
+      return;
+    }
+    
+    $.ajax({
+      url: '@{LobbyCreationR}',
+      type: 'POST',
+      contentType: "application/json",
+      data: JSON.stringify({
+        lobbyname: lobbyname,
+      }),
+      success: function (data) {
+        var newNode = $("<li></li>");
+        newNode.text(data.lobbyname);
+        console.log(data);
+        $("##{rawJS lobbyListId}").append(newNode);
+      },
+      error: function(data) {
+        console.log("Error creating lobby: " + lobbyname);
+      },
+    });
+  });
+});
