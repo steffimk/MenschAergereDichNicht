@@ -9,36 +9,31 @@ data FieldType = Standard | Start | Home | First deriving Show
 data Figure = Figure {
                 number :: Int,
                 color  :: Color
-              }
+              } deriving Show
 
 data Field = Field {
               fieldType   :: FieldType,
               fieldColor  :: Maybe Color,
               figure      :: Maybe Figure
-            }
+            } deriving Show
 
 data StartFields = StartFields {
               yellowHome :: [Field],
               greenHome  :: [Field],
               blueHome   :: [Field],
               redHome    :: [Field]
-            }
+            } deriving Show
 
-data BoardStatus = BoardStatus {
+data BoardState = BoardState {
                     board      :: [Field],
                     startFields :: StartFields
-                  }
+                  } deriving Show
 
-let startFields = StartFields{
-                    yellowHome = initStart Yellow,
-                    greenHome  = initStart Green,
-                    blueHome   = initStart Blue,
-                    redHome    = initStart Red
-                  }
-
-let board = [ (intToField x) | x <- [0..55] ]
-
-let status = BoardStatus{ board = board, homeFields = homeFields }
+initNewBoardState :: BoardState
+initNewBoardState = do
+    let startFields = StartFields (initStart Yellow) (initStart Green) (initStart Blue) (initStart Red)
+    let board = [ (intToField x) | x <- [0..55] ]
+    BoardState{ board = board, startFields = startFields }
 
 intToField :: Int -> Field
 intToField x
