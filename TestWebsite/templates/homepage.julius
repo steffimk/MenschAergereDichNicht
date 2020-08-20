@@ -29,7 +29,6 @@ $(function() {
         console.log("Error creating comment: " + data);
       },
     });
-
   });
 });
 
@@ -43,21 +42,25 @@ $(function() {
       return;
     }
     
+    var csrfToken = Cookies.get(csrfCookieName);
+    
     $.ajax({
       url: '@{LobbyCreationR}',
       type: 'POST',
       contentType: "application/json",
       data: JSON.stringify({
         lobbyname: lobbyname,
+        player_token: csrfToken,
       }),
       success: function (data) {
         var newNode = $("<li></li>");
-        newNode.text(data.lobbyname);
+        newNode.text("lobbyname: " + data.lobbyname + "\nplayer_token: " + data.player_token);
         console.log(data);
         $("##{rawJS lobbyListId}").append(newNode);
       },
       error: function(data) {
         console.log("Error creating lobby: " + lobbyname);
+        console.log("Player token: " + data.player_token);
       },
     });
   });
