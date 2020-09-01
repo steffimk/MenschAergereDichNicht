@@ -1,4 +1,4 @@
-module Board where
+module Model.Board where
 
 import Prelude
 
@@ -20,11 +20,11 @@ initNewBoardState :: BoardState
 initNewBoardState = BoardState ((initFigures Yellow)++(initFigures Green)++(initFigures Blue)++(initFigures Red)) Yellow -- TODO: immer gelb?
 
 initFigures :: Color -> [Figure]
-initFigures color = [Figure color Start | x <- [0..3]]
+initFigures color1 = [Figure color1 Start | x <- [0..3]]
 
 getBoardOffset :: Color -> Int
-getBoardOffset color = 
-  case color of
+getBoardOffset color1 = 
+  case color1 of
     Yellow  -> 0
     Green   -> 14
     Blue    -> 28
@@ -37,8 +37,8 @@ getFieldNumber (Home x)     = x
 getFieldNumber (First x)    = x
 
 getHomeOffset :: Color -> Int
-getHomeOffset color =
-  case color of
+getHomeOffset color1 =
+  case color1 of
     Yellow  -> 52
     Green   -> 10
     Blue    -> 24
@@ -57,7 +57,21 @@ intToField x
   | otherwise       = Standard x
 
 nextTurn :: [Figure] -> Color -> Color
-nextTurn _ _ = Yellow --TODO
+nextTurn figures1 Yellow = getNextColor figures1 [Green ..]
+nextTurn figures1 Green  = getNextColor figures1 [Blue, Red, Yellow]
+nextTurn figures1 Blue  = getNextColor figures1 [Red, Yellow, Green]
+nextTurn figures1 Red  = getNextColor figures1 [Yellow, Green, Blue]
 
-hasWon :: [Figure] -> Color -> Bool
-hasWon _ _ = False --TODO
+getNextColor :: [Figure] -> [Color] -> Color
+getNextColor figures1 colors =
+  let colorsInGame = [ c | c <- colors, (hasFinishedGame figures1 c) == False]
+  in if null colorsInGame
+       then Yellow -- TODO
+       else head colorsInGame
+
+hasFinishedGame :: [Figure] -> Color -> Bool
+hasFinishedGame figures1 color1 = foldl (&&) True (map isFigureHome [f | f <- figures1, (color f) == color1])
+
+isFigureHome :: Figure -> Bool
+isFigureHome (Figure _ (Home _)) = True
+isFigureHome _                   = False
