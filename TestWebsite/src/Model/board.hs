@@ -7,7 +7,7 @@ data Color = Yellow | Green | Blue | Red deriving (Eq, Enum, Show)
 data Figure = Figure {
                 color  :: Color,
                 currentField :: Field
-              } deriving Show
+              } deriving (Eq, Show)
 
 data Field = Standard Int | Start | Home Int | First Int deriving (Eq, Show)
 
@@ -55,3 +55,9 @@ intToField x
   | elem x [38..41] = Home x
   | elem x [52..55] = Home x
   | otherwise       = Standard x
+
+nextTurn :: [Figure] -> Color -> Color
+nextTurn _ _ = Yellow --TODO
+
+hasWon :: [Figure] -> Color -> Bool
+hasWon _ _ = False --TODO
