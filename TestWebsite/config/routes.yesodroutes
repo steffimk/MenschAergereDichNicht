@@ -8,6 +8,6 @@
 
 / HomeR GET POST
 
-/comments CommentR POST GET
+/comments CommentR POST
 
 /lobby_creation LobbyCreationR POST

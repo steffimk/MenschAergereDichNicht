@@ -45,16 +45,13 @@ postLobbyCreationR :: Handler Value
 postLobbyCreationR = do
     -- requireCheckJsonBody will parse the request body into the appropriate type, or return a 400 status code if the request JSON is invalid.
     lobby <- requireCheckJsonBody :: Handler Lobby
-    let countLobbies = addLobby lobby
-    case countLobbies of
-        1         -> returnJson lobby
-        otherwise -> returnJson countLobbies
+    let _ = addLobby lobby
     -- let openLobbies = openLobbies { open_lobbies = (open_lobbies openLobbies) ++ [lobby] }
     -- openLobbies <- lobby
     --nuffin <- addLobby lobby
     -- addLobby lobby
 
-    --returnJson lobby
+    returnJson lobby
 
 -- postLobbyCreationR :: HandlerFor App Value
 -- postLobbyCreationR = do
@@ -65,14 +62,7 @@ postLobbyCreationR = do
 
 --     returnJson lobby
 
-postCommentR :: Handler Value
-postCommentR = do
-    -- requireCheckJsonBody will parse the request body into the appropriate type, or return a 400 status code if the request JSON is invalid.
-    comment <- requireCheckJsonBody :: Handler OpenLobbies
-
-    returnJson comment
-
-getCommentR :: Handler Value
-getCommentR = do
-    openLobbies <- Current.Monad.State.get
-    returnJson openLobbies
+-- getCommentR :: Handler Value
+-- getCommentR = do
+--     let openLobbies = getOpenLobbies
+--     returnJson openLobbies
