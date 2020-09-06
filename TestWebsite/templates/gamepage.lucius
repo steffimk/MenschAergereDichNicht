@@ -1,20 +1,31 @@
 table {
-  border-spacing: 10px
+  border-spacing: 10px;
 }
 
 td {
-  padding: 10px
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .greenField {
-  background-color: rgb(15,182,5)
+  background-color: rgb(15,182,5);
+  border: 4px solid white
 }
 .blueField {
-  background-color: rgb(5,56,196)
+  background-color: rgb(0,111,255);
+  border: 4px solid white
 }
 .yellowField {
-  background-color: rgb(241,211,3)
+  background-color: rgb(241,211,3);
+  border: 4px solid white
 }
 .redField {
-  background-color: rgb(250,1,68)
+  background-color: rgb(250,1,68);
+  border: 4px solid white
+}
+
+.standardField {
+  background-color: rgb(216,216,216);
+  border: 4px solid white
 }

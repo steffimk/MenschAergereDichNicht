@@ -1,39 +1,40 @@
 <div>
   <h1>Gamepage
   <h2>Turn of #{turnString}
+  $# <button>Roll the dice
   <table>
     <tr>
-      <td .greenField>GreenStart 2
-      <td .greenField>GreenStart 3
+      <td .greenField> 2
+      <td .greenField> 3
       <td>
       <td>
-      <td>Standard 22
-      <td>Standard 23
-      <td .blueField>First 28
+      <td .standardField>22
+      <td .standardField>23
+      <td .blueField>28
       <td> 
       <td>
-      <td .blueField>BlueStart 2
-      <td .blueField>BlueStart 3
+      <td .blueField>2
+      <td .blueField>3
    <tr>
-      <td .greenField>GreenStart 1
-      <td .greenField>GreenStart 0
+      <td .greenField>1
+      <td .greenField>0
       <td>
       <td>  
-      <td>Standard 21
-      <td .blueField>Home 24
-      <td>Standard 29 
+      <td .standardField>21
+      <td .blueField>24
+      <td .standardField>29 
       <td>  
       <td>  
-      <td .blueField>BlueStart 1
-      <td>BlueStart 0
+      <td .blueField>1
+      <td .blueField>0
     <tr>
       <td>
       <td>  
       <td>  
       <td>
-      <td>Standard 20
-      <td .blueField>Home 25
-      <td>Standard 30  
+      <td .standardField>20
+      <td .blueField>25
+      <td .standardField>30  
       <td>  
       <td>  
       <td>  
@@ -43,94 +44,94 @@
       <td>  
       <td>  
       <td>
-      <td>Standard 19
-      <td .blueField>Home 26
-      <td>Standard 31  
+      <td .standardField>19
+      <td .blueField>26
+      <td .standardField>31  
       <td>  
       <td>  
       <td>  
       <td> 
     <tr>
-      <td .greenField>First 14
-      <td>Standard 15
-      <td>Standard 16  
-      <td>Standard 17
-      <td>Standard 18
-      <td .blueField>Home 27  
-      <td>Standard 32
-      <td>Standard 33
-      <td>Standard 34
-      <td>Standard 35
-      <td>Standard 36
+      <td .greenField>14
+      <td .standardField>15
+      <td .standardField>16  
+      <td .standardField>17
+      <td .standardField>18
+      <td .blueField>27  
+      <td .standardField>32
+      <td .standardField>33
+      <td .standardField>34
+      <td .standardField>35
+      <td .standardField>36
     <tr>
-      <td>Standard 9
-      <td .greenField>Home 10
-      <td .greenField>Home 11  
-      <td .greenField>Home 12
-      <td .greenField>Home 13
+      <td .standardField>9
+      <td .greenField>10
+      <td .greenField>11  
+      <td .greenField>12
+      <td .greenField>13
       <td> 
-      <td .redField>Home 41
-      <td .redField>Home 40
-      <td .redField>Home 39
-      <td .redField>Home 38
-      <td>Standard 37
+      <td .redField>41
+      <td .redField>40
+      <td .redField>39
+      <td .redField>38
+      <td .standardField>37
     <tr>
-      <td>Standard 8
-      <td>Standard 7
-      <td>Standard 6  
-      <td>Standard 5
-      <td>Standard 4
-      <td .yellowField>Home 55
-      <td>Standard 46
-      <td>Standard 45
-      <td>Standard 44
-      <td>Standard 43
-      <td .redField>First 42
-    <tr>
-      <td>
-      <td>  
-      <td>  
-      <td>
-      <td>Standard 3
-      <td .yellowField>Home 54
-      <td>Standard 47  
-      <td>  
-      <td>  
-      <td>  
-      <td> 
+      <td .standardField>8
+      <td .standardField>7
+      <td .standardField>6  
+      <td .standardField>5
+      <td .standardField>4
+      <td .yellowField>55
+      <td .standardField>46
+      <td .standardField>45
+      <td .standardField>44
+      <td .standardField>43
+      <td .redField>42
     <tr>
       <td>
       <td>  
       <td>  
       <td>
-      <td>Standard 2
-      <td .yellowField>Home 53
-      <td>Standard 48  
+      <td .standardField>3
+      <td .yellowField>54
+      <td .standardField>47  
       <td>  
       <td>  
       <td>  
       <td> 
     <tr>
-      <td .yellowField>YellowStart 2
-      <td .yellowField>YellowStart 3
       <td>
+      <td>  
+      <td>  
       <td>
-      <td>Standard 1
-      <td .yellowField>Home 52
-      <td>Standard 49
+      <td .standardField>2
+      <td .yellowField>53
+      <td .standardField>48  
+      <td>  
+      <td>  
+      <td>  
       <td> 
-      <td> 
-      <td .redField>RedStart 2
-      <td .redField>RedStart 3
     <tr>
-      <td .yellowField>YellowStart 1
-      <td .yellowField>YellowStart 0
+      <td .yellowField>2
+      <td .yellowField>3
       <td>
       <td>
-      <td .yellowField>First 0
-      <td>Standard 51
-      <td>Standard 50
+      <td .standardField>1
+      <td .yellowField>52
+      <td .standardField>49
       <td> 
       <td> 
-      <td .redField>RedStart 1
-      <td .redField>RedStart 0
+      <td .redField>2
+      <td .redField>3
+    <tr>
+      <td .yellowField>1
+      <td .yellowField>0
+      <td>
+      <td>
+      <td .yellowField>0
+      <td .standardField>51
+      <td .standardField>50
+      <td> 
+      <td> 
+      <td .redField>1
+      <td .redField>0
