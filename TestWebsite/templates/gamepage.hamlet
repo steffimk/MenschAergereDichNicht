@@ -1,0 +1,136 @@
+<div>
+  <h1>Gamepage
+  <h2>Turn of #{turnString}
+  <table>
+    <tr>
+      <td .greenField>GreenStart 2
+      <td .greenField>GreenStart 3
+      <td>
+      <td>
+      <td>Standard 22
+      <td>Standard 23
+      <td .blueField>First 28
+      <td> 
+      <td>
+      <td .blueField>BlueStart 2
+      <td .blueField>BlueStart 3
+   <tr>
+      <td .greenField>GreenStart 1
+      <td .greenField>GreenStart 0
+      <td>
+      <td>  
+      <td>Standard 21
+      <td .blueField>Home 24
+      <td>Standard 29 
+      <td>  
+      <td>  
+      <td .blueField>BlueStart 1
+      <td>BlueStart 0
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td>Standard 20
+      <td .blueField>Home 25
+      <td>Standard 30  
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td>Standard 19
+      <td .blueField>Home 26
+      <td>Standard 31  
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td .greenField>First 14
+      <td>Standard 15
+      <td>Standard 16  
+      <td>Standard 17
+      <td>Standard 18
+      <td .blueField>Home 27  
+      <td>Standard 32
+      <td>Standard 33
+      <td>Standard 34
+      <td>Standard 35
+      <td>Standard 36
+    <tr>
+      <td>Standard 9
+      <td .greenField>Home 10
+      <td .greenField>Home 11  
+      <td .greenField>Home 12
+      <td .greenField>Home 13
+      <td> 
+      <td .redField>Home 41
+      <td .redField>Home 40
+      <td .redField>Home 39
+      <td .redField>Home 38
+      <td>Standard 37
+    <tr>
+      <td>Standard 8
+      <td>Standard 7
+      <td>Standard 6  
+      <td>Standard 5
+      <td>Standard 4
+      <td .yellowField>Home 55
+      <td>Standard 46
+      <td>Standard 45
+      <td>Standard 44
+      <td>Standard 43
+      <td .redField>First 42
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td>Standard 3
+      <td .yellowField>Home 54
+      <td>Standard 47  
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td>Standard 2
+      <td .yellowField>Home 53
+      <td>Standard 48  
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td .yellowField>YellowStart 2
+      <td .yellowField>YellowStart 3
+      <td>
+      <td>
+      <td>Standard 1
+      <td .yellowField>Home 52
+      <td>Standard 49
+      <td> 
+      <td> 
+      <td .redField>RedStart 2
+      <td .redField>RedStart 3
+    <tr>
+      <td .yellowField>YellowStart 1
+      <td .yellowField>YellowStart 0
+      <td>
+      <td>
+      <td .yellowField>First 0
+      <td>Standard 51
+      <td>Standard 50
+      <td> 
+      <td> 
+      <td .redField>RedStart 1
+      <td .redField>RedStart 0

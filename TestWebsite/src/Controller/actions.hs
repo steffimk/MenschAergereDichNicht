@@ -7,11 +7,8 @@ import System.Random
 
 rollTheDice :: IO Int
 rollTheDice = do
-  randInt <- newRand
+  randInt <- randomIO
   return ((mod randInt 6) + 1)
-
-newRand :: IO Int
-newRand = randomIO :: IO Int
 
 moveFigure :: Figure -> Int -> BoardState -> BoardState
 moveFigure figure count boardState =

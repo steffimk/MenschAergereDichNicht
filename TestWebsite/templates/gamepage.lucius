@@ -1,0 +1,20 @@
+table {
+  border-spacing: 10px
+}
+
+td {
+  padding: 10px
+}
+
+.greenField {
+  background-color: rgb(15,182,5)
+}
+.blueField {
+  background-color: rgb(5,56,196)
+}
+.yellowField {
+  background-color: rgb(241,211,3)
+}
+.redField {
+  background-color: rgb(250,1,68)
+}
