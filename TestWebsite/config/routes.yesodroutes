@@ -8,6 +8,6 @@
 
 / HomeR GET POST
 
-/game GameR GET
+/game/#String GameR GET POST
 
 /comments CommentR POST

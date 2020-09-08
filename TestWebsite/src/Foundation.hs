@@ -9,7 +9,9 @@
 module Foundation where
 
 import Import.NoFoundation
+import Control.Concurrent.STM
 import Control.Monad.Logger        (LogSource)
+import Model.Board
 import Text.Hamlet                 (hamletFile)
 import Text.Jasmine                (minifym)
 import Yesod.Core.Types            (Logger)
@@ -27,6 +29,7 @@ data App = App
     , appStatic      :: Static -- ^ Settings for static file serving.
     , appHttpManager :: Manager
     , appLogger      :: Logger
+    , games          :: TVar [(String, BoardState)]
     }
 
 data MenuItem = MenuItem
@@ -82,7 +85,7 @@ instance Yesod App where
     -- To add it, chain it together with the defaultMiddleware: yesodMiddleware = defaultYesodMiddleware . defaultCsrfMiddleware
     -- For details, see the CSRF documentation in the Yesod.Core.Handler module of the yesod-core package.
     yesodMiddleware :: ToTypedContent res => Handler res -> Handler res
-    yesodMiddleware = defaultYesodMiddleware
+    yesodMiddleware = defaultYesodMiddleware . defaultCsrfMiddleware
 
     defaultLayout :: Widget -> Handler Html
     defaultLayout widget = do

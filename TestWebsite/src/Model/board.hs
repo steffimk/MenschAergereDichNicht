@@ -2,7 +2,7 @@ module Model.Board where
 
 import Prelude
 
-data Color = Yellow | Green | Blue | Red deriving (Eq, Enum, Show)
+data Color = Yellow | Green | Blue | Red deriving (Eq, Enum)
 
 data Figure = Figure {
                 color  :: Color,
@@ -46,6 +46,7 @@ getHomeOffset color1 =
 
 intToField :: Int -> Field
 intToField x
+  | x < 0           = Start
   | x == 0          = First x
   | x == 14         = First x
   | x == 28         = First x
@@ -75,3 +76,84 @@ hasFinishedGame figures1 color1 = foldl (&&) True (map isFigureHome [f | f <- fi
 isFigureHome :: Figure -> Bool
 isFigureHome (Figure _ (Home _)) = True
 isFigureHome _                   = False
+
+instance Show Color where
+  show Yellow = "Y"
+  show Green = "G"
+  show Blue = "B"
+  show Red = "R"
+
+showGerman :: Color -> String
+showGerman Yellow = "Gelb"
+showGerman Green = "Grün"
+showGerman Blue = "Blau"
+showGerman Red = "Rot"
+
+stringToColor :: String -> Color
+stringToColor "Y" = Yellow
+stringToColor "G" = Green
+stringToColor "B" = Blue
+stringToColor _   = Red
+
+getGUIString :: Int -> [Figure] -> String
+getGUIString n figures1
+  | n >= 0 = getGUIStringForFieldNumber n figures1
+  | n == -10 = if countOf (Figure Yellow Start) figures1 > 0
+                then "Y"
+                else "___"
+  | n == -11 = if countOf (Figure Yellow Start) figures1 > 1
+                then "Y"
+                else "___"
+  | n == -12 =if countOf (Figure Yellow Start) figures1 > 2
+                then "Y"
+                else "___"
+  | n == -13 = if countOf (Figure Yellow Start) figures1 > 3
+                then "Y"
+                else "___"
+  | n == -20 = if countOf (Figure Green Start) figures1 > 0
+                then "G"
+                else "___"
+  | n == -21 = if countOf (Figure Green Start) figures1 > 1
+                then "G"
+                else "___"
+  | n == -22 = if countOf (Figure Green Start) figures1 > 2
+                then "G"
+                else "___"
+  | n == -23 = if countOf (Figure Green Start) figures1 > 3
+                then "G"
+                else "___"
+  | n == -30 = if countOf (Figure Blue Start) figures1 > 0
+                then "B"
+                else "___"
+  | n == -31 = if countOf (Figure Blue Start) figures1 > 1
+                then "B"
+                else "___"
+  | n == -32 = if countOf (Figure Blue Start) figures1 > 2
+                then "B"
+                else "___"
+  | n == -33 = if countOf (Figure Blue Start) figures1 > 3
+                then "B"
+                else "___"
+  | n == -40 = if countOf (Figure Red Start) figures1 > 0
+                then "R"
+                else "___"
+  | n == -41 = if countOf (Figure Red Start) figures1 > 1
+                then "R"
+                else "___"
+  | n == -42 = if countOf (Figure Red Start) figures1 > 2
+                then "R"
+                else "___"
+  | n == -43 = if countOf (Figure Red Start) figures1 > 3
+                then "R"
+                else "___"
+  
+
+getGUIStringForFieldNumber :: Int -> [Figure] -> String
+getGUIStringForFieldNumber _ [] = "___" 
+getGUIStringForFieldNumber n ((Figure color1 field):xs) = 
+  if (getFieldNumber field) == n
+    then (show color1)
+    else getGUIStringForFieldNumber n xs
+
+countOf :: Eq a => a -> [a] -> Int
+countOf x xs = length $ filter (==x) xs

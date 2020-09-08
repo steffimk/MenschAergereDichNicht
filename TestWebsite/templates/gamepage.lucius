@@ -8,6 +8,13 @@ td {
   vertical-align: middle;
 }
 
+td a {
+  display:block;
+  position:relative;
+  color: rgb(0,0,0);
+  text-decoration: none;
+}
+
 .greenField {
   background-color: rgb(15,182,5);
   border: 4px solid white

@@ -1,47 +1,61 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TypeFamilies #-}
 module Handler.Game where
-
-import Import
+import Data.Aeson
+import GHC.Generics
+import Import hiding (map, head, elem, fst, snd, filter, atomically, readTVarIO, writeTVar)
 import Text.Julius (RawJS (..))
 import Controller.Actions
+import Control.Concurrent.STM
 import Model.Board
+import Prelude
 
-getGameR :: Handler Html
-getGameR = do
-    let boardState = initNewBoardState :: BoardState
-        turnString = show $ turn boardState
-    defaultLayout $ do
-        setTitle "Mensch ärgere Dich nicht"
-        $(widgetFile "gamepage")
+data MoveData = MoveData {colorString :: String, fieldNr :: Int} deriving (Generic, Show)
+instance ToJSON MoveData where
+    toEncoding = genericToEncoding defaultOptions
+instance FromJSON MoveData
 
-    -- toWidget [lucius| h1 { color: green; } |]
-    -- addScriptRemote "https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"
-    -- toWidget
-    --     [julius|
-    --         $(function() {
-    --             $("h1").click(function(){
-    --                 alert("You clicked on the heading!");
-    --             });
-    --         });
-    --         $(function() {
-    --             $("h2").click(function(){
-    --                 alert("You clicked on the heading2!");
-    --             });
-    --         });
-    --     |]
-    -- toWidgetHead
-    --     [hamlet|
-    --         <meta name=keywords content="some sample keywords">
-    --     |]
-    -- [whamlet|<h1>Mensch ärgere Dich nicht</tt> <h2>Am Zug: Gelb|]
-    -- toWidgetBody
-    --     [julius|
-    --         alert("This is included in the body itself");
-    --     |]
+moveDataToFigure :: MoveData -> Figure
+moveDataToFigure (MoveData colorString fieldNr) = Figure (stringToColor colorString) (intToField fieldNr)
 
--- postGameR :: Handler BoardState
--- postGameR = 
+getGameR :: String -> Handler Html
+getGameR gameID = do
+    master <- getYesod
+    gameList <- liftIO $ Control.Concurrent.STM.readTVarIO $ games master
+    if elem gameID (map fst gameList)
+        then
+            do
+                let boardState = snd $ head $ filter (\x -> fst x == gameID) gameList :: BoardState
+                    figs = figures boardState
+                    color = turn boardState
+                defaultLayout $ do
+                    setTitle "Mensch ärgere Dich nicht"
+                    $(widgetFile "gamepage")
+        else 
+            defaultLayout $ do
+                setTitle "Mensch ärgere Dich nicht"
+                $(widgetFile "waitpage")
+
+postGameR :: String -> Handler ()
+postGameR gameID = do
+    moveData <- requireCheckJsonBody :: Handler MoveData
+    master <- getYesod
+    gameList <- liftIO $ readTVarIO $ games master
+    if elem gameID (map fst gameList)
+        then do
+            let oldBoardState = snd $ head $ filter (\x -> fst x == gameID) gameList :: BoardState
+                diceResult = 6 -- TODO: dice boardState 
+                boardState = moveFigure (moveDataToFigure moveData) diceResult oldBoardState
+            liftIO $ Prelude.putStrLn (show boardState)
+            liftIO $ atomically $ writeTVar (games master) [("s", boardState)]
+            return ()
+        else return ()
+    -- defaultLayout $ do
+    --     let move = show $ moveData
+    --     setTitle "Mensch ärgere Dich nicht"
+    --     $(widgetFile "waitpage")

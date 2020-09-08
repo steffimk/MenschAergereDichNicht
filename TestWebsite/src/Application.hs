@@ -20,6 +20,7 @@ module Application
     ) where
 
 import Control.Monad.Logger                 (liftLoc)
+import Control.Concurrent.STM
 import Import
 import Language.Haskell.TH.Syntax           (qLocation)
 import Network.HTTP.Client.TLS              (getGlobalManager)
@@ -32,6 +33,7 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
                                              IPAddrSource (..),
                                              OutputFormat (..), destination,
                                              mkRequestLogger, outputFormat)
+import Model.Board
 import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
                                              toLogStr)
 
@@ -60,6 +62,7 @@ makeFoundation appSettings = do
     appStatic <-
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
+    games <- Control.Concurrent.STM.newTVarIO [("s", initNewBoardState)]
 
     -- Return the foundation
     return App {..}
