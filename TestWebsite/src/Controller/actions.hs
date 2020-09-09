@@ -33,7 +33,7 @@ isValidAction :: Figure -> Int -> BoardState -> Bool
 isValidAction (Figure color1 currentField1) 6 (BoardState figures1 _) =
   if isInsertingNewFigureIfNeeded (Figure color1 currentField1) figures1
     then True
-    else isMovingFirstIfNeeded (Figure color1 currentField1) figures1
+    else currentField1 == First (getBoardOffset color1)
 -- cannot move Start figure if count not six
 isValidAction (Figure _ Start) _ _ = False
 -- other moves
@@ -51,16 +51,17 @@ isMovingFirstIfNeeded :: Figure -> [Figure] -> Bool
 isMovingFirstIfNeeded (Figure color1 (First x)) figures1 = 
   if x == getBoardOffset color1
     then True
-    else not (elem (Figure color1 (First (getBoardOffset color1))) figures1 && (isStartNotEmpty color1 figures1))
-isMovingFirstIfNeeded (Figure color1 _) figures1 = not (elem (Figure color1 (First (getBoardOffset color1))) figures1 && (isStartNotEmpty color1 figures1))
+    else not (elem (Figure color1 (First (getBoardOffset color1))) figures1 && (hasStartFigures color1 figures1))
+isMovingFirstIfNeeded (Figure color1 _) figures1 = 
+  not (elem (Figure color1 (First (getBoardOffset color1))) figures1 && (hasStartFigures color1 figures1))
 
 -- Wenn sechs gewürfelt und noch mind 1 Figur im Start: Figur aufs Spielbrett bewegen
 isInsertingNewFigureIfNeeded :: Figure -> [Figure] -> Bool
-isInsertingNewFigureIfNeeded (Figure _ (Start))    _        = True
-isInsertingNewFigureIfNeeded (Figure color1 _)     figures1 = not (isStartNotEmpty color1 figures1)
+isInsertingNewFigureIfNeeded (Figure _ Start)    _        = True
+isInsertingNewFigureIfNeeded (Figure color1 _)   figures1 = not (hasStartFigures color1 figures1)
 
-isStartNotEmpty :: Color -> [Figure] -> Bool
-isStartNotEmpty color1 figures1 = elem (Figure color1 Start) figures1
+hasStartFigures :: Color -> [Figure] -> Bool
+hasStartFigures color1 figures1 = elem (Figure color1 Start) figures1
 
 -- Neues Feld falls ausführbar (Keine eigene Figur auf dem Feld und Homefeld richtig getroffen)
 getNewField :: Figure -> Int -> BoardState -> Maybe Field

@@ -8,7 +8,7 @@
 module Handler.Game where
 import Data.Aeson
 import GHC.Generics
-import Import hiding (map, head, elem, fst, snd, filter, atomically, readTVarIO, writeTVar)
+import Import hiding (map, head, elem, fst, snd, filter, atomically, readTVarIO, writeTVar, (++))
 import Text.Julius (RawJS (..))
 import Controller.Actions
 import Control.Concurrent.STM
@@ -53,7 +53,9 @@ postGameR gameID = do
                 diceResult = dice -- TODO: dice boardState 
                 boardState = moveFigure (moveDataToFigure moveData) diceResult oldBoardState
             liftIO $ Prelude.putStrLn (show boardState)
-            liftIO $ atomically $ writeTVar (games master) [("s", boardState)]
+            liftIO $ Prelude.putStrLn ("###############" ++ (show dice))
+            let newGameList = (:) (gameID, boardState) (filter (\x -> fst x /= gameID) gameList) 
+            liftIO $ atomically $ writeTVar (games master) newGameList
             returnJson moveData
         else returnJson moveData
     -- defaultLayout $ do
