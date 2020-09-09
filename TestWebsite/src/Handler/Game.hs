@@ -41,20 +41,21 @@ getGameR gameID = do
                 setTitle "Mensch ärgere Dich nicht"
                 $(widgetFile "waitpage")
 
-postGameR :: String -> Handler ()
+postGameR :: String -> Handler Value
 postGameR gameID = do
     moveData <- requireCheckJsonBody :: Handler MoveData
     master <- getYesod
     gameList <- liftIO $ readTVarIO $ games master
     if elem gameID (map fst gameList)
         then do
+            dice <- liftIO $ rollTheDice
             let oldBoardState = snd $ head $ filter (\x -> fst x == gameID) gameList :: BoardState
-                diceResult = 6 -- TODO: dice boardState 
+                diceResult = dice -- TODO: dice boardState 
                 boardState = moveFigure (moveDataToFigure moveData) diceResult oldBoardState
             liftIO $ Prelude.putStrLn (show boardState)
             liftIO $ atomically $ writeTVar (games master) [("s", boardState)]
-            return ()
-        else return ()
+            returnJson moveData
+        else returnJson moveData
     -- defaultLayout $ do
     --     let move = show $ moveData
     --     setTitle "Mensch ärgere Dich nicht"

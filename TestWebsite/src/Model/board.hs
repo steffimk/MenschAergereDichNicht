@@ -90,63 +90,26 @@ showGerman Blue = "Blau"
 showGerman Red = "Rot"
 
 stringToColor :: String -> Color
-stringToColor "Y" = Yellow
-stringToColor "G" = Green
-stringToColor "B" = Blue
-stringToColor _   = Red
+stringToColor str = 
+  case (str!!0) of
+    'Y' -> Yellow
+    'G' -> Green
+    'B' -> Blue
+    _   -> Red
 
 getGUIString :: Int -> [Figure] -> String
 getGUIString n figures1
-  | n >= 0 = getGUIStringForFieldNumber n figures1
-  | n == -10 = if countOf (Figure Yellow Start) figures1 > 0
-                then "Y"
-                else "___"
-  | n == -11 = if countOf (Figure Yellow Start) figures1 > 1
-                then "Y"
-                else "___"
-  | n == -12 =if countOf (Figure Yellow Start) figures1 > 2
-                then "Y"
-                else "___"
-  | n == -13 = if countOf (Figure Yellow Start) figures1 > 3
-                then "Y"
-                else "___"
-  | n == -20 = if countOf (Figure Green Start) figures1 > 0
-                then "G"
-                else "___"
-  | n == -21 = if countOf (Figure Green Start) figures1 > 1
-                then "G"
-                else "___"
-  | n == -22 = if countOf (Figure Green Start) figures1 > 2
-                then "G"
-                else "___"
-  | n == -23 = if countOf (Figure Green Start) figures1 > 3
-                then "G"
-                else "___"
-  | n == -30 = if countOf (Figure Blue Start) figures1 > 0
-                then "B"
-                else "___"
-  | n == -31 = if countOf (Figure Blue Start) figures1 > 1
-                then "B"
-                else "___"
-  | n == -32 = if countOf (Figure Blue Start) figures1 > 2
-                then "B"
-                else "___"
-  | n == -33 = if countOf (Figure Blue Start) figures1 > 3
-                then "B"
-                else "___"
-  | n == -40 = if countOf (Figure Red Start) figures1 > 0
-                then "R"
-                else "___"
-  | n == -41 = if countOf (Figure Red Start) figures1 > 1
-                then "R"
-                else "___"
-  | n == -42 = if countOf (Figure Red Start) figures1 > 2
-                then "R"
-                else "___"
-  | n == -43 = if countOf (Figure Red Start) figures1 > 3
-                then "R"
-                else "___"
-  
+  | n    >= 0 = getGUIStringForFieldNumber n figures1
+  | n+15 >= 0 = getGUIStringForStartField Yellow n figures1
+  | n+25 >= 0 = getGUIStringForStartField Green n figures1
+  | n+35 >= 0 = getGUIStringForStartField Blue n figures1
+  | otherwise = getGUIStringForStartField Red n figures1
+
+getGUIStringForStartField :: Color -> Int -> [Figure] -> String
+getGUIStringForStartField color1 startFieldNumber figures1 =
+    if countOf (Figure color1 Start) figures1 > (mod (abs startFieldNumber) 10)
+      then (show color1)
+      else "___"
 
 getGUIStringForFieldNumber :: Int -> [Figure] -> String
 getGUIStringForFieldNumber _ [] = "___" 

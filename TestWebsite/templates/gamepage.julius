@@ -31,7 +31,8 @@ function makeMove(fieldNr) {
       fieldNr: fieldNr
     }),
     success: function (data) {
-      alert("Erfolgreich an Server geschickt");
+      //alert("Erfolgreich an Server geschickt");
+      location.reload();
       console.log(data);
     },
     error: function (data) {

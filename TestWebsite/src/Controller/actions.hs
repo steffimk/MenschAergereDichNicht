@@ -31,11 +31,9 @@ newBoardState newField (Figure _ oldField) (BoardState figures1 turn1) =
 isValidAction :: Figure -> Int -> BoardState -> Bool
 -- check if valid when 6 got diced
 isValidAction (Figure color1 currentField1) 6 (BoardState figures1 _) =
-  if not (isMovingFirstIfNeeded (Figure color1 currentField1) figures1)
-    then False
-    else if isInsertingNewFigureIfNeeded (Figure color1 currentField1) figures1
-          then True
-          else False
+  if isInsertingNewFigureIfNeeded (Figure color1 currentField1) figures1
+    then True
+    else isMovingFirstIfNeeded (Figure color1 currentField1) figures1
 -- cannot move Start figure if count not six
 isValidAction (Figure _ Start) _ _ = False
 -- other moves
@@ -89,22 +87,26 @@ getHitColor newField turn1 figures1   =
 
 calculateNewField :: Figure -> Int -> Maybe Field
 calculateNewField (Figure color1 Start)         _      = Just (First (getBoardOffset color1))
-calculateNewField (Figure color1 currentField1) count2 =
-  let calcHelper = \x count1 overShoot ->
-          let newNumber = (x + count1)
-          in if elem (overShoot!!0) [x..newNumber]
-              then Nothing
-              else if elem (overShoot!!1) [x..newNumber] || elem (overShoot!!2) [x..newNumber] || elem (overShoot!!3) [x..newNumber]
-                    then Just (intToField (newNumber+4))
-                    else Just (intToField newNumber)
-  in let  calculateField Yellow x count1 = calcHelper x count1 [56, 10, 24, 38]
-          calculateField Green  x count1 = calcHelper x count1 [14, 24, 38, 52]
-          calculateField Blue   x count1 = calcHelper x count1 [28, 10, 38, 52]
-          calculateField Red    x count1 = calcHelper x count1 [42, 10, 24, 52]
-      in case currentField1 of
-          Standard x -> calculateField color1 x count2
-          Home x     -> calculateField color1 x count2
-          First x    -> calculateField color1 x count2
+calculateNewField (Figure color1 (First x))     count1 = 
+  if x == getBoardOffset color1
+    then Just (intToField (x + count1))
+    else calculateField color1 x count1
+calculateNewField (Figure color1 currentField1) count1 = calculateField color1 (getFieldNumber currentField1) count1
+    
+calcHelper :: Int -> Int -> [Int] -> Maybe Field
+calcHelper x count1 overShoot =
+  let newNumber = (x + count1)
+    in if elem (overShoot!!0) [x..newNumber]
+        then Nothing
+        else if elem (overShoot!!1) [x..newNumber] || elem (overShoot!!2) [x..newNumber] || elem (overShoot!!3) [x..newNumber]
+              then Just (intToField $ mod (newNumber+4) 56)
+              else Just (intToField $ mod newNumber 56)
+
+calculateField :: Color -> Int -> Int -> Maybe Field
+calculateField Yellow x count1 = calcHelper x count1 [56, 10, 24, 38]
+calculateField Green  x count1 = calcHelper x count1 [14, 24, 38, 52]
+calculateField Blue   x count1 = calcHelper x count1 [28, 10, 38, 52]
+calculateField Red    x count1 = calcHelper x count1 [42, 10, 24, 52]
 
 delete :: Eq t => t -> [t] -> [t]
 delete _ []    = []
