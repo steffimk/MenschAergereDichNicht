@@ -31,7 +31,7 @@ function refreshOpenLobbies(){
           return;
         } else {
           var newNode = $("<li></li>");
-          newNode.text("lobbyname: " + lobby.lobbyname + "\nplayer_tokens: " + lobby.player_tokens);
+          newNode.text("lobbyname: " + lobby.lobbyname + "\nplayers: [" + lobby.player_tokens.length + "/4]");
 
           if (!lobby.player_tokens.includes(csrfToken)) {
             var joinButton = document.createElement("button");
