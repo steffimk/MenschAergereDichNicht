@@ -11,18 +11,18 @@ rollTheDice = do
   return ((mod randInt 6) + 1)
 
 moveFigure :: Figure -> Int -> BoardState -> BoardState
-moveFigure figure count boardState =
+moveFigure figure diceResult boardState =
   if not ((isTurnOfColor (color figure) (turn boardState)) && (elem figure (figures boardState))
-    && (isValidAction figure count boardState))
+    && (isValidAction figure diceResult boardState))
     then boardState -- TODO: einfach unverändert zurückgeben oder error "Invalid move"
-    else let mNewField = getNewField figure count boardState in
+    else let mNewField = getNewField figure diceResult boardState in
       case mNewField of
         Nothing -> boardState -- TODO: einfach unverändert zurückgeben oder error "Invalid move"
-        Just _  -> newBoardState (fromJust mNewField) figure boardState
+        Just _  -> newBoardState (fromJust mNewField) figure boardState diceResult
 
-newBoardState :: Field -> Figure -> BoardState -> BoardState 
-newBoardState newField (Figure _ oldField) (BoardState figures1 turn1) = 
-  let newBoardState1 = BoardState ((delete (Figure turn1 oldField) figures1) ++ [Figure turn1 newField]) (nextTurn figures1 turn1) 
+newBoardState :: Field -> Figure -> BoardState -> Int ->  BoardState 
+newBoardState newField (Figure _ oldField) (BoardState figures1 turn1) diceResult = 
+  let newBoardState1 = BoardState ((delete (Figure turn1 oldField) figures1) ++ [Figure turn1 newField]) (nextTurn figures1 turn1 diceResult) 
   in if not (mHitColor == Nothing)
         then BoardState ((delete (Figure (fromJust mHitColor) newField) (figures newBoardState1)) ++ [Figure (fromJust mHitColor) Start]) (turn newBoardState1) 
         else newBoardState1

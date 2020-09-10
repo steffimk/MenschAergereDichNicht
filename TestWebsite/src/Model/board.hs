@@ -57,11 +57,12 @@ intToField x
   | elem x [52..55] = Home x
   | otherwise       = Standard x
 
-nextTurn :: [Figure] -> Color -> Color
-nextTurn figures1 Yellow = getNextColor figures1 [Green ..]
-nextTurn figures1 Green  = getNextColor figures1 [Blue, Red, Yellow]
-nextTurn figures1 Blue  = getNextColor figures1 [Red, Yellow, Green]
-nextTurn figures1 Red  = getNextColor figures1 [Yellow, Green, Blue]
+nextTurn :: [Figure] -> Color -> Int -> Color
+nextTurn _        color1 6 = color1     
+nextTurn figures1 Yellow _ = getNextColor figures1 [Green ..]
+nextTurn figures1 Green  _ = getNextColor figures1 [Blue, Red, Yellow]
+nextTurn figures1 Blue   _ = getNextColor figures1 [Red, Yellow, Green]
+nextTurn figures1 Red    _ = getNextColor figures1 [Yellow, Green, Blue]
 
 getNextColor :: [Figure] -> [Color] -> Color
 getNextColor figures1 colors =
