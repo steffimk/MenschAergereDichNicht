@@ -1,17 +1,18 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE NoImplicitPrelude     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE TypeFamilies          #-}
 module Handler.Home where
 
-import Import
-import Yesod.Form.Bootstrap3 (BootstrapFormLayout (..), renderBootstrap3)
-import Text.Julius (RawJS (..))
+import           Import
+import           Text.Julius           (RawJS (..))
+import           Yesod.Form.Bootstrap3 (BootstrapFormLayout (..),
+                                        renderBootstrap3)
 
 -- Define our data that will be used for creating the form.
 data FileForm = FileForm
-    { fileInfo :: FileInfo
+    { fileInfo        :: FileInfo
     , fileDescription :: Text
     }
 
@@ -24,27 +25,26 @@ data FileForm = FileForm
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler Html
 getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe FileForm
-        handlerName = "getHomeR" :: Text
+    (_, _) <- generateFormPost sampleForm
+    let _ = Nothing :: Maybe FileForm
+        _ = "getHomeR" :: Text
     defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
-            (lobbyFormId, lobbynameTextareaId, lobbyListId) = lobbyIds
+        let (lobbyFormId, lobbynameTextareaId, lobbyListId) = lobbyIds
+            (joinButton, leaveButton, startGameButton) = lobbyButtons
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
 
 postHomeR :: Handler Html
 postHomeR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postHomeR" :: Text
-        submission = case result of
+    ((result, _), _) <- runFormPost sampleForm
+    let _ = "postHomeR" :: Text
+        _ = case result of
             FormSuccess res -> Just res
-            _ -> Nothing
+            _               -> Nothing
 
     defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
-            (lobbyFormId, lobbynameTextareaId, lobbyListId) = lobbyIds
+        let (lobbyFormId, lobbynameTextareaId, lobbyListId) = lobbyIds
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
@@ -65,8 +65,8 @@ sampleForm = renderBootstrap3 BootstrapBasicForm $ FileForm
                 ]
             }
 
-commentIds :: (Text, Text, Text)
-commentIds = ("js-commentForm", "js-createCommentTextarea", "js-commentList")
-
 lobbyIds :: (Text, Text, Text)
 lobbyIds = ("js-lobbyForm", "js-createLobbynameTextarea", "js-lobbyList")
+
+lobbyButtons :: (Text, Text, Text)
+lobbyButtons = ("js-joinButton", "js-leaveButton", "js-startGameButton")

@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE InstanceSigs          #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoImplicitPrelude     #-}
@@ -8,6 +9,7 @@
 module Foundation where
 
 import           Control.Monad.Logger (LogSource)
+import           Control.Monad.State
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding   as TE
 import           Import.NoFoundation
@@ -17,15 +19,31 @@ import           Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe    as Unsafe
 import           Yesod.Default.Util   (addStaticContentExternal)
 
+
+type CSRF_Token = Text
+
+data Lobby = Lobby { lobbyname :: Text, player_tokens :: [CSRF_Token] } deriving (Generic, Show)
+instance FromJSON Lobby
+instance ToJSON Lobby
+
+data LobbyToJoin = LobbyToJoin { lobbynameToJoin :: Text, players_token :: CSRF_Token } deriving (Generic, Show)
+instance FromJSON LobbyToJoin
+instance ToJSON LobbyToJoin
+
+data LobbyToLeave = LobbyToLeave { lobbynameToLeave :: Text, leaving_players_token :: CSRF_Token } deriving (Generic, Show)
+instance FromJSON LobbyToLeave
+instance ToJSON LobbyToLeave
+
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
 -- starts running, such as database connections. Every handler will have
 -- access to the data present here.
 data App = App
-    { appSettings    :: AppSettings
-    , appStatic      :: Static -- ^ Settings for static file serving.
-    , appHttpManager :: Manager
-    , appLogger      :: Logger
+    { appSettings       :: AppSettings
+    , appStatic         :: Static -- ^ Settings for static file serving.
+    , appHttpManager    :: Manager
+    , appLogger         :: Logger
+    , openLobbiesMaster :: TVar [Lobby]
     }
 
 data MenuItem = MenuItem
@@ -70,7 +88,7 @@ instance Yesod App where
     -- default session idle timeout is 120 minutes
     makeSessionBackend :: App -> IO (Maybe SessionBackend)
     makeSessionBackend _ = Just <$> defaultClientSessionBackend
-        120    -- timeout in minutes
+        1440    -- timeout in minutes
         "config/client_session_key.aes"
 
     -- Yesod Middleware allows you to run code before and after each handler function.

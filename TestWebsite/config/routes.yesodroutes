@@ -11,3 +11,9 @@
 /comments CommentR POST
 
 /lobby_creation LobbyCreationR POST
+
+/open_lobbies OpenLobbiesR GET
+
+/join_lobby JoinLobbyR POST
+
+/leave_lobby LeaveLobbyR POST

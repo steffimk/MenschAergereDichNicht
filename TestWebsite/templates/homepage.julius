@@ -1,36 +1,112 @@
-document.getElementById(#{toJSON aDomId}).innerHTML = "This text was added by the Javascript part of the homepage widget.";
+refreshOpenLobbies();
 
-$(function() {
-  $("##{rawJS commentFormId}").submit(function(event) {
-    event.preventDefault();
+document.addEventListener("DOMContentLoaded", function(){
+    console.log("Add Event Listener");
+    let refreshObenLobbiesButton = document.getElementById("refreshOpenLobbies");
+    refreshObenLobbiesButton.addEventListener("click", refreshOpenLobbies);
+})
 
-    var message = $("##{rawJS commentTextareaId}").val();
-    // (Browsers that enforce the "required" attribute on the textarea won't see this alert)
-    if (!message) {
-      alert("Please fill out the comment form first.");
-      return;
+function refreshOpenLobbies(){
+  console.log("refreshOpenLobbies function called")
+
+  document.getElementById("#{rawJS lobbyListId}").innerHTML="";
+
+  $.ajax({
+    url: '@{OpenLobbiesR}',
+    type: 'GET',
+    contentType: "application/json",
+    success: function (data) {
+      console.log(data);
+      var csrfToken = Cookies.get(csrfCookieName);
+      data.forEach(function(lobby) {
+        if ((lobby.player_tokens.length === 4) && (lobby.player_tokens.includes(csrfToken))){
+          document.getElementById("#{rawJS lobbyListId}").innerHTML="";
+          var newNode = $ ("<li></li>");
+          var startGameButton = document.createElement("button");
+          startGameButton.style.color = "white";
+          startGameButton.innerHTML = "Start Game";
+          startGameButton.style.background='#808080'
+          newNode.append(startGameButton);
+          $("##{rawJS lobbyListId}").append(newNode);
+          return;
+        } else {
+          var newNode = $("<li></li>");
+          newNode.text("lobbyname: " + lobby.lobbyname + "\nplayer_tokens: " + lobby.player_tokens);
+
+          if (!lobby.player_tokens.includes(csrfToken)) {
+            var joinButton = document.createElement("button");
+            joinButton.style.color = "white";
+            joinButton.innerHTML = "Join";
+            joinButton.style.background='#008000';
+            joinButton.addEventListener("click", function(e) {
+              e.preventDefault();
+              $.ajax({
+                url: '@{JoinLobbyR}',
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                  lobbynameToJoin: lobby.lobbyname,
+                  players_token: csrfToken,
+                }),
+                success: function (data) {
+                  if (data.lobbynameToJoin === "") {
+                    alert("This lobby does not exist anymore or is already full.");
+                    refreshOpenLobbies();
+                  } else {
+                    console.log("joined lobby: " + data);
+                    refreshOpenLobbies();
+                  }
+                },
+                error: function(data) {
+                  console.log("Error joining lobby: " + lobby.lobbyname);
+                  console.log("Player token: " + data.players_tokens);
+                },
+              })
+            });
+            newNode.append(joinButton);
+          } else {
+            var leaveButton = document.createElement("button");
+            leaveButton.style.color = "white";
+            leaveButton.innerHTML = "Leave";
+            leaveButton.style.background='#800000';
+            leaveButton.addEventListener('click', function(e) {
+              e.preventDefault();
+              $.ajax({
+                url: '@{LeaveLobbyR}',
+                type: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                  lobbynameToLeave: lobby.lobbyname,
+                  leaving_players_token: csrfToken,
+                }),
+                success: function (data) {
+                  if (data.lobbynameToLeave === "") {
+                    alert("Can't leave a full lobby.");
+                    refreshOpenLobbies();
+                  }
+                  console.log("leaving lobby: " + data),
+                  refreshOpenLobbies();
+                },
+                error: function(data) {
+                  console.log("Error leaving lobby: " + lobby.lobbyname);
+                  console.log("Player token: " + data.leaving_players_token);
+                }
+              })
+            })
+            newNode.append(leaveButton);
+          }
+
+          console.log(data);
+          $("##{rawJS lobbyListId}").append(newNode);
+        }
+      });
+    },
+    error: function (data) {
+      console.log("Error loading lobbies: " + data);
+      alert("Could not load lobbies, pleasy try again.");
     }
-
-    // Make an AJAX request to the server to create a new comment
-    $.ajax({
-      url: '@{CommentR}',
-      type: 'POST',
-      contentType: "application/json",
-      data: JSON.stringify({
-        message: message,
-      }),
-      success: function (data) {
-        var newNode = $("<li></li>");
-        newNode.text(data.message);
-        console.log(data);
-        $("##{rawJS commentListId}").append(newNode);
-      },
-      error: function (data) {
-        console.log("Error creating comment: " + data);
-      },
-    });
-  });
-});
+  })
+}
 
 $(function() {
   $("##{rawJS lobbyFormId}").submit(function(event) {
@@ -38,30 +114,54 @@ $(function() {
 
     var lobbyname = $("##{rawJS lobbynameTextareaId}").val();
     if (!lobbyname) {
-      alert("Please enter a lobbyname first.")
+      alert("Please enter a lobbyname first.");
       return;
     }
     
     var csrfToken = Cookies.get(csrfCookieName);
-    
+
+    var lobbynameAlreadyExists = false;
+
     $.ajax({
-      url: '@{LobbyCreationR}',
-      type: 'POST',
+      url: '@{OpenLobbiesR}',
+      type: 'GET',
       contentType: "application/json",
-      data: JSON.stringify({
-        lobbyname: lobbyname,
-        player_token: csrfToken,
-      }),
       success: function (data) {
-        var newNode = $("<li></li>");
-        newNode.text("lobbyname: " + data.lobbyname + "\nplayer_token: " + data.player_token);
-        console.log(data);
-        $("##{rawJS lobbyListId}").append(newNode);
+        data.forEach(function(lobby) {
+          if (lobby.lobbyname.toLowerCase() === lobbyname.toLowerCase()) {
+            alert("A lobby with that name already exists, please choose another.");
+            lobbynameAlreadyExists = true;
+            refreshOpenLobbies();
+            return;
+          }
+        })
+
+        if (!lobbynameAlreadyExists) {
+          $.ajax({
+            url: '@{LobbyCreationR}',
+            type: 'POST',
+            contentType: "application/json",
+            data: JSON.stringify({
+              lobbyname: lobbyname,
+              player_tokens: [csrfToken],
+            }),
+            success: function (data) {
+              console.log("Lobby created: " + data);
+              refreshOpenLobbies();
+            },
+            error: function(data) {
+              console.log("Error creating lobby: " + data);
+              alert("Could not create lobby, pleasy try again.");
+              refreshOpenLobbies();
+            },
+          });
+        }
       },
-      error: function(data) {
-        console.log("Error creating lobby: " + lobbyname);
-        console.log("Player token: " + data.player_token);
-      },
+      error: function (data) {
+        console.log("Error in lobby creation when trying to load currently open lobbies");
+        alert("Could not create lobby, pleasy try again.");
+      }
+
     });
   });
 });

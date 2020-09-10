@@ -7,12 +7,13 @@ li {
     font-size: 16px
 }
 
-##{commentTextareaId} {
+##{lobbynameTextareaId} {
     width: 400px;
     height: 100px;
 }
 
-##{lobbynameTextareaId} {
-    width: 400px;
-    height: 100px;
+.openLobby {
+    joinButton.style.color: white;
+    joinButton.innerHTML: "Join";
+    joinButton.style.background: '#008000';
 }
