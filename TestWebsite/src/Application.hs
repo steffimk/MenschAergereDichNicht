@@ -5,6 +5,8 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE ViewPatterns          #-}
+
 module Application
     ( getApplicationDev
     , appMain
@@ -62,7 +64,7 @@ makeFoundation appSettings = do
     appStatic <-
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
-    openLobbiesMaster <- newTVarIO []
+    openLobbiesMaster <- Control.Concurrent.STM.newTVarIO []
     games <- Control.Concurrent.STM.newTVarIO [("s", initNewBoardState)]
 
     -- Return the foundation

@@ -5,10 +5,12 @@
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE ViewPatterns          #-}
+
 
 module Foundation where
 
-import           Control.Monad.Logger (LogSource)
+import Control.Monad.Logger (LogSource)
 import Import.NoFoundation
 import Control.Concurrent.STM
 import Control.Monad.Logger        (LogSource)
@@ -46,7 +48,7 @@ data App = App
     , appHttpManager    :: Manager
     , appLogger         :: Logger
     , openLobbiesMaster :: TVar [Lobby]
-    , games          :: TVar [(String, BoardState)]
+    , games             :: TVar [(String, BoardState)]
     }
 
 data MenuItem = MenuItem
