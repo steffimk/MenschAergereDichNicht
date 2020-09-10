@@ -1,0 +1,42 @@
+document.addEventListener("DOMContentLoaded", function(){
+	console.log("Add Event Listener")
+  let diceButton = document.getElementById("dice");
+	diceButton.addEventListener("click", dice);
+})
+
+function dice(){
+  console.log("Dice function called")
+  document.getElementById("diceResult").innerHTML = getRandomInt(7)
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+function makeMove(fieldNr) {
+  let currentURL = window.location.href;
+  let color = document.getElementById(fieldNr).innerHTML
+  if (color == "___") {
+    alert("Drücke auf die Figur, die bewegt werden soll.");
+    return;
+  }
+  console.log("Color on field: %s", color)
+  console.log(`Make Move ${fieldNr}`);
+  $.ajax({
+    url: currentURL,
+    type: 'POST',
+    contentType: "application/json",
+    data: JSON.stringify({
+      colorString: color,
+      fieldNr: fieldNr
+    }),
+    success: function (data) {
+      //alert("Erfolgreich an Server geschickt");
+      location.reload();
+      console.log(data);
+    },
+    error: function (data) {
+      console.log("Error making move: " + data);
+    },
+  });
+}

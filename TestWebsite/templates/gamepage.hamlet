@@ -1,0 +1,143 @@
+<div>
+  <h1>Mensch ärgere Dich nicht
+  <p>GameID: #{gameID}
+  <h2>#{showGerman $ turn boardState} ist am Zug
+  <table>
+    <tr>
+      <td>
+        <button #dice>Würfeln
+      <td #diceResult>___
+      <td>Drücke auf die Figur, die du bewegen möchtest.
+  <table>
+    <tr>
+      <td .greenField><a href="javascript:makeMove(-22)" id="-22">#{getGUIString -22 figs}
+      <td .greenField><a href="javascript:makeMove(-23)" id="-23">#{getGUIString -23 figs}
+      <td>
+      <td>
+      <td .standardField><a href="javascript:makeMove(22)" id="22">#{getGUIString 22 figs}
+      <td .standardField><a href="javascript:makeMove(23)" id="23">#{getGUIString 23 figs}
+      <td .blueField><a href="javascript:makeMove(28)" id="28">#{getGUIString 28 figs}
+      <td> 
+      <td>
+      <td .blueField><a href="javascript:makeMove(-32)" id="-32">#{getGUIString -32 figs}
+      <td .blueField><a href="javascript:makeMove(-33)" id="-33">#{getGUIString -33 figs}
+    <tr>
+      <td .greenField><a href="javascript:makeMove(-21)" id="-21">#{getGUIString -21 figs}
+      <td .greenField><a href="javascript:makeMove(-20)" id="-20">#{getGUIString -20 figs}
+      <td>
+      <td>  
+      <td .standardField><a href="javascript:makeMove(21)" id="21">#{getGUIString 21 figs}
+      <td .blueField><a href="javascript:makeMove(24)" id="24">#{getGUIString 24 figs}
+      <td .standardField><a href="javascript:makeMove(29)" id="29">#{getGUIString 29 figs}
+      <td>  
+      <td>  
+      <td .blueField><a href="javascript:makeMove(-31)" id="-31">#{getGUIString -31 figs}
+      <td .blueField><a href="javascript:makeMove(-30)" id="-30">#{getGUIString -30 figs}
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td .standardField><a href="javascript:makeMove(20)" id="20">#{getGUIString 20 figs}
+      <td .blueField><a href="javascript:makeMove(25)" id="25">#{getGUIString 25 figs}
+      <td .standardField><a href="javascript:makeMove(30)" id="30">#{getGUIString 30 figs} 
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td .standardField><a href="javascript:makeMove(19)" id="19">#{getGUIString 19 figs}
+      <td .blueField><a href="javascript:makeMove(26)" id="26">#{getGUIString 26 figs}
+      <td .standardField><a href="javascript:makeMove(31)" id="31">#{getGUIString 31 figs}  
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td .greenField><a href="javascript:makeMove(14)" id="14">#{getGUIString 14 figs}
+      <td .standardField><a href="javascript:makeMove(15)" id="15">#{getGUIString 15 figs}
+      <td .standardField><a href="javascript:makeMove(16)" id="16">#{getGUIString 16 figs} 
+      <td .standardField><a href="javascript:makeMove(17)" id="17">#{getGUIString 17 figs}
+      <td .standardField><a href="javascript:makeMove(18)" id="18">#{getGUIString 18 figs}
+      <td .blueField><a href="javascript:makeMove(27)" id="27">#{getGUIString 27 figs}
+      <td .standardField><a href="javascript:makeMove(32)" id="32">#{getGUIString 32 figs}
+      <td .standardField><a href="javascript:makeMove(33)" id="33">#{getGUIString 33 figs}
+      <td .standardField><a href="javascript:makeMove(34)" id="34">#{getGUIString 34 figs}
+      <td .standardField><a href="javascript:makeMove(35)" id="35">#{getGUIString 35 figs}
+      <td .standardField><a href="javascript:makeMove(36)" id="36">#{getGUIString 36 figs}
+    <tr>
+      <td .standardField><a href="javascript:makeMove(9)" id="9">#{getGUIString 9 figs}
+      <td .greenField><a href="javascript:makeMove(10)" id="10">#{getGUIString 10 figs}
+      <td .greenField><a href="javascript:makeMove(11)" id="11">#{getGUIString 11 figs} 
+      <td .greenField><a href="javascript:makeMove(12)" id="12">#{getGUIString 12 figs}
+      <td .greenField><a href="javascript:makeMove(13)" id="13">#{getGUIString 13 figs}
+      <td> 
+      <td .redField><a href="javascript:makeMove(41)" id="41">#{getGUIString 41 figs}
+      <td .redField><a href="javascript:makeMove(40)" id="40">#{getGUIString 40 figs}
+      <td .redField><a href="javascript:makeMove(39)" id="39">#{getGUIString 39 figs}
+      <td .redField><a href="javascript:makeMove(38)" id="38">#{getGUIString 38 figs}
+      <td .standardField><a href="javascript:makeMove(37)" id="37">#{getGUIString 37 figs}
+    <tr>
+      <td .standardField><a href="javascript:makeMove(8)" id="8">#{getGUIString 8 figs}
+      <td .standardField><a href="javascript:makeMove(7)" id="7">#{getGUIString 7 figs}
+      <td .standardField><a href="javascript:makeMove(6)" id="6">#{getGUIString 6 figs}  
+      <td .standardField><a href="javascript:makeMove(5)" id="5">#{getGUIString 5 figs}
+      <td .standardField><a href="javascript:makeMove(4)" id="4">#{getGUIString 4 figs}
+      <td .yellowField><a href="javascript:makeMove(55)" id="55">#{getGUIString 55 figs}
+      <td .standardField><a href="javascript:makeMove(46)" id="46">#{getGUIString 46 figs}
+      <td .standardField><a href="javascript:makeMove(45)" id="45">#{getGUIString 45 figs}
+      <td .standardField><a href="javascript:makeMove(44)" id="44">#{getGUIString 44 figs}
+      <td .standardField><a href="javascript:makeMove(43)" id="43">#{getGUIString 43 figs}
+      <td .redField><a href="javascript:makeMove(42)" id="42">#{getGUIString 42 figs}
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td .standardField><a href="javascript:makeMove(3)" id="3">#{getGUIString 3 figs}
+      <td .yellowField><a href="javascript:makeMove(54)" id="54">#{getGUIString 54 figs}
+      <td .standardField><a href="javascript:makeMove(47)" id="47">#{getGUIString 47 figs}  
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td>
+      <td>  
+      <td>  
+      <td>
+      <td .standardField><a href="javascript:makeMove(2)" id="2">#{getGUIString 2 figs}
+      <td .yellowField><a href="javascript:makeMove(53)" id="53">#{getGUIString 53 figs}
+      <td .standardField><a href="javascript:makeMove(48)" id="48">#{getGUIString 48 figs}  
+      <td>  
+      <td>  
+      <td>  
+      <td> 
+    <tr>
+      <td .yellowField #><a href="javascript:makeMove(-12)" id="-12">#{getGUIString -12 figs}
+      <td .yellowField #><a href="javascript:makeMove(-13)" id="-13">#{getGUIString -13 figs}
+      <td>
+      <td>
+      <td .standardField><a href="javascript:makeMove(1)" id="1">#{getGUIString 1 figs}
+      <td .yellowField><a href="javascript:makeMove(52)" id="52">#{getGUIString 52 figs}
+      <td .standardField><a href="javascript:makeMove(49)" id="49">#{getGUIString 49 figs}
+      <td> 
+      <td> 
+      <td .redField><a href="javascript:makeMove(-42)" id="-42">#{getGUIString -42 figs}
+      <td .redField><a href="javascript:makeMove(-43)" id="-43">#{getGUIString -43 figs}
+    <tr>
+      <td .yellowField><a href="javascript:makeMove(-11)" id="-11">#{getGUIString -11 figs}
+      <td .yellowField><a href="javascript:makeMove(-10)" id="-10">#{getGUIString -10 figs}
+      <td>
+      <td>
+      <td .yellowField><a href="javascript:makeMove(0)" id="0">#{getGUIString 0 figs}
+      <td .standardField><a href="javascript:makeMove(51)" id="51">#{getGUIString 51 figs}
+      <td .standardField><a href="javascript:makeMove(50)" id="50">#{getGUIString 50 figs}
+      <td> 
+      <td> 
+      <td .redField><a href="javascript:makeMove(-41)" id="-41">#{getGUIString -41 figs}
+      <td .redField><a href="javascript:makeMove(-40)" id="-40">#{getGUIString -40 figs}

@@ -18,38 +18,36 @@ module Application
     , handler
     ) where
 
-import           Control.Monad.Logger                 (liftLoc)
-import           Import
-import           Language.Haskell.TH.Syntax           (qLocation)
-import           Network.HTTP.Client.TLS              (getGlobalManager)
-import           Network.Wai                          (Middleware)
-import           Network.Wai.Handler.Warp             (Settings,
-                                                       defaultSettings,
-                                                       defaultShouldDisplayException,
-                                                       getPort, runSettings,
-                                                       setHost, setOnException,
-                                                       setPort)
-import           Network.Wai.Middleware.RequestLogger (Destination (Logger),
-                                                       IPAddrSource (..),
-                                                       OutputFormat (..),
-                                                       destination,
-                                                       mkRequestLogger,
-                                                       outputFormat)
-import           System.Log.FastLogger                (defaultBufSize,
-                                                       newStdoutLoggerSet,
-                                                       toLogStr)
+import Control.Monad.Logger                 (liftLoc)
+import Control.Concurrent.STM
+import Import
+import Language.Haskell.TH.Syntax           (qLocation)
+import Network.HTTP.Client.TLS              (getGlobalManager)
+import Network.Wai (Middleware)
+import Network.Wai.Handler.Warp             (Settings, defaultSettings,
+                                             defaultShouldDisplayException,
+                                             runSettings, setHost,
+                                             setOnException, setPort, getPort)
+import Network.Wai.Middleware.RequestLogger (Destination (Logger),
+                                             IPAddrSource (..),
+                                             OutputFormat (..), destination,
+                                             mkRequestLogger, outputFormat)
+import Model.Board
+import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
+                                             toLogStr)
 
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
-import           Handler.Comment
-import           Handler.Common
-import           Handler.Home
-import           Handler.Lobby
+import Handler.Common
+import Handler.Home
+import Handler.Game
+import Handler.Comment
+import Handler.Lobby
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
 -- comments there for more details.
-mkYesodDispatch "App" resourcesApp
+mkYesodDispatch "App" resourcesApp 
 
 -- | This function allocates resources (such as a database connection pool),
 -- performs initialization and returns a foundation datatype value. This is also
@@ -65,6 +63,7 @@ makeFoundation appSettings = do
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
     openLobbiesMaster <- newTVarIO []
+    games <- Control.Concurrent.STM.newTVarIO [("s", initNewBoardState)]
 
     -- Return the foundation
     return App {..}

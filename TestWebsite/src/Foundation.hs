@@ -9,15 +9,17 @@
 module Foundation where
 
 import           Control.Monad.Logger (LogSource)
-import           Control.Monad.State
+import Import.NoFoundation
+import Control.Concurrent.STM
+import Control.Monad.Logger        (LogSource)
+import Model.Board
+import Text.Hamlet                 (hamletFile)
+import Text.Jasmine                (minifym)
+import Yesod.Core.Types            (Logger)
+import Yesod.Default.Util          (addStaticContentExternal)
+import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding   as TE
-import           Import.NoFoundation
-import           Text.Hamlet          (hamletFile)
-import           Text.Jasmine         (minifym)
-import           Yesod.Core.Types     (Logger)
-import qualified Yesod.Core.Unsafe    as Unsafe
-import           Yesod.Default.Util   (addStaticContentExternal)
 
 
 type CSRF_Token = Text
@@ -44,6 +46,7 @@ data App = App
     , appHttpManager    :: Manager
     , appLogger         :: Logger
     , openLobbiesMaster :: TVar [Lobby]
+    , games          :: TVar [(String, BoardState)]
     }
 
 data MenuItem = MenuItem

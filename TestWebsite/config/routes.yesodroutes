@@ -8,6 +8,8 @@
 
 / HomeR GET POST
 
+/game/#String GameR GET POST
+
 /comments CommentR POST
 
 /lobby_creation LobbyCreationR POST
