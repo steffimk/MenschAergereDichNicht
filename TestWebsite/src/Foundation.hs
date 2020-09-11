@@ -14,7 +14,7 @@ import Control.Monad.Logger (LogSource)
 import Import.NoFoundation
 import Control.Concurrent.STM
 import Control.Monad.Logger        (LogSource)
-import Model.Board
+import Model.GameInfo
 import Text.Hamlet                 (hamletFile)
 import Text.Jasmine                (minifym)
 import Yesod.Core.Types            (Logger)
@@ -48,7 +48,7 @@ data App = App
     , appHttpManager    :: Manager
     , appLogger         :: Logger
     , openLobbiesMaster :: TVar [Lobby]
-    , games             :: TVar [(String, BoardState)]
+    , games             :: TVar [GameInfo]
     }
 
 data MenuItem = MenuItem

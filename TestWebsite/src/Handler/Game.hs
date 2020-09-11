@@ -13,6 +13,7 @@ import Text.Julius (RawJS (..))
 import Controller.Actions
 import Control.Concurrent.STM
 import Model.Board
+import Model.GameInfo
 import Prelude
 
 data MoveData = MoveData {colorString :: String, fieldNr :: Int} deriving (Generic, Show)
@@ -27,15 +28,22 @@ getGameR :: String -> Handler Html
 getGameR gameID = do
     master <- getYesod
     gameList <- liftIO $ Control.Concurrent.STM.readTVarIO $ games master
-    if elem gameID (map fst gameList)
-        then
-            do
-                let boardState = snd $ head $ filter (\x -> fst x == gameID) gameList :: BoardState
-                    figs = figures boardState
-                    color = turn boardState
-                defaultLayout $ do
-                    setTitle "Mensch ärgere Dich nicht"
-                    $(widgetFile "gamepage")
+    if elem gameID (map lobbyId gameList)
+        then do
+            newDice <- liftIO $ rollTheDice
+            let gameInfo = head $ filter (\x -> lobbyId x == gameID) gameList :: GameInfo
+                oldBoardState = boardState gameInfo :: BoardState
+                dice = if diceResult oldBoardState > 0 then (diceResult oldBoardState) else newDice
+                figs = figures oldBoardState
+                color = turn oldBoardState
+            if diceResult oldBoardState == 0 
+                then let newBoardState = oldBoardState {diceResult = dice}
+                         newGameList = (:) (GameInfo gameID newBoardState (colorMap gameInfo)) (filter (\x -> lobbyId x /= gameID) gameList)
+                     in do liftIO $ atomically $ writeTVar (games master) newGameList
+                else do return ()
+            defaultLayout $ do
+                setTitle "Mensch ärgere Dich nicht"
+                $(widgetFile "gamepage")
         else 
             defaultLayout $ do
                 setTitle "Mensch ärgere Dich nicht"
@@ -46,15 +54,13 @@ postGameR gameID = do
     moveData <- requireCheckJsonBody :: Handler MoveData
     master <- getYesod
     gameList <- liftIO $ readTVarIO $ games master
-    if elem gameID (map fst gameList)
+    if elem gameID (map lobbyId gameList)
         then do
-            dice <- liftIO $ rollTheDice
-            let oldBoardState = snd $ head $ filter (\x -> fst x == gameID) gameList :: BoardState
-                diceResult = dice -- TODO: dice boardState 
-                boardState = moveFigure (moveDataToFigure moveData) diceResult oldBoardState
-            liftIO $ Prelude.putStrLn (show boardState)
-            liftIO $ Prelude.putStrLn ("###############" ++ (show dice))
-            let newGameList = (:) (gameID, boardState) (filter (\x -> fst x /= gameID) gameList) 
+            let gameInfo = head $ filter (\x -> lobbyId x == gameID) gameList :: GameInfo
+                oldBoardState = boardState gameInfo :: BoardState
+                newBoardState = moveFigure (moveDataToFigure moveData) oldBoardState
+            liftIO $ Prelude.putStrLn (show newBoardState)
+            let newGameList = (:) (GameInfo gameID newBoardState (colorMap gameInfo)) (filter (\x -> lobbyId x /= gameID) gameList) 
             liftIO $ atomically $ writeTVar (games master) newGameList
             returnJson moveData
         else returnJson moveData

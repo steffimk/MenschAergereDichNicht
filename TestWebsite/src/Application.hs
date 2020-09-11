@@ -35,6 +35,7 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
                                              OutputFormat (..), destination,
                                              mkRequestLogger, outputFormat)
 import Model.Board
+import Model.GameInfo
 import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
                                              toLogStr)
 
@@ -65,7 +66,7 @@ makeFoundation appSettings = do
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
     openLobbiesMaster <- Control.Concurrent.STM.newTVarIO []
-    games <- Control.Concurrent.STM.newTVarIO [("s", initNewBoardState)]
+    games <- Control.Concurrent.STM.newTVarIO [GameInfo "s" initNewBoardState []]
 
     -- Return the foundation
     return App {..}

@@ -10,34 +10,40 @@ rollTheDice = do
   randInt <- randomIO
   return ((mod randInt 6) + 1)
 
-moveFigure :: Figure -> Int -> BoardState -> BoardState
-moveFigure figure diceResult boardState =
-  if not ((isTurnOfColor (color figure) (turn boardState)) && (elem figure (figures boardState))
-    && (isValidAction figure diceResult boardState))
-    then boardState -- TODO: einfach unverändert zurückgeben oder error "Invalid move"
-    else let mNewField = getNewField figure diceResult boardState in
-      case mNewField of
-        Nothing -> boardState -- TODO: einfach unverändert zurückgeben oder error "Invalid move"
-        Just _  -> newBoardState (fromJust mNewField) figure boardState diceResult
+moveFigure :: Figure -> BoardState -> BoardState
+moveFigure figure boardState =
+  if not ((diceResult boardState > 0) && (isTurnOfColor (color figure) (turn boardState)) && (elem figure (figures boardState)))
+    then boardState
+    else if (isValidAction figure boardState)
+      then let mNewField = getNewField figure boardState in
+        case mNewField of
+          Nothing -> boardState -- Einfach unverändert zurückgeben
+          Just _  -> newBoardState (fromJust mNewField) figure boardState
+      else if canMakeAMove boardState
+            then boardState -- Einfach unverändert zurückgeben
+            else boardState {turn = nextTurn boardState, diceResult = 0}
 
-newBoardState :: Field -> Figure -> BoardState -> Int ->  BoardState 
-newBoardState newField (Figure _ oldField) (BoardState figures1 turn1) diceResult = 
-  let newBoardState1 = BoardState ((delete (Figure turn1 oldField) figures1) ++ [Figure turn1 newField]) (nextTurn figures1 turn1 diceResult) 
+canMakeAMove :: BoardState -> Bool
+canMakeAMove boardState = foldl (||) False $ map (\x -> isValidAction x boardState) [f | f <- (figures boardState), color f == turn boardState]
+
+newBoardState :: Field -> Figure -> BoardState ->  BoardState 
+newBoardState newField (Figure _ oldField) (BoardState figures1 turn1 diceResult) = 
+  let newBoardState1 = BoardState ((delete (Figure turn1 oldField) figures1) ++ [Figure turn1 newField]) (nextTurn (BoardState figures1 turn1 diceResult)) 0
   in if not (mHitColor == Nothing)
-        then BoardState ((delete (Figure (fromJust mHitColor) newField) (figures newBoardState1)) ++ [Figure (fromJust mHitColor) Start]) (turn newBoardState1) 
+        then BoardState ((delete (Figure (fromJust mHitColor) newField) (figures newBoardState1)) ++ [Figure (fromJust mHitColor) Start]) (turn newBoardState1) 0
         else newBoardState1
   where mHitColor = getHitColor newField turn1 figures1
 
-isValidAction :: Figure -> Int -> BoardState -> Bool
+isValidAction :: Figure -> BoardState -> Bool
 -- check if valid when 6 got diced
-isValidAction (Figure color1 currentField1) 6 (BoardState figures1 _) =
+isValidAction (Figure color1 currentField1) (BoardState figures1 _ 6) =
   if isInsertingNewFigureIfNeeded (Figure color1 currentField1) figures1
     then True
     else currentField1 == First (getBoardOffset color1)
 -- cannot move Start figure if count not six
-isValidAction (Figure _ Start) _ _ = False
+isValidAction (Figure _ Start) _ = False
 -- other moves
-isValidAction (Figure color1 currentField1) _ (BoardState figures1 _) =
+isValidAction (Figure color1 currentField1) (BoardState figures1 _ _) =
   if not (isMovingFirstIfNeeded (Figure color1 currentField1) figures1)
     then False
     else True
@@ -64,9 +70,9 @@ hasStartFigures :: Color -> [Figure] -> Bool
 hasStartFigures color1 figures1 = elem (Figure color1 Start) figures1
 
 -- Neues Feld falls ausführbar (Keine eigene Figur auf dem Feld und Homefeld richtig getroffen)
-getNewField :: Figure -> Int -> BoardState -> Maybe Field
-getNewField figure count (BoardState figures1 turn1) =
-  let mNewField = (calculateNewField figure count) in
+getNewField :: Figure -> BoardState -> Maybe Field
+getNewField figure (BoardState figures1 turn1 diceResult) =
+  let mNewField = (calculateNewField figure diceResult) in
     case mNewField of
       Nothing -> Nothing
       Just _  -> if isOccupiedByOwnFigure (fromJust mNewField) turn1 figures1
