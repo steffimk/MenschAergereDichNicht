@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function(){
 	console.log("Add Event Listener")
-  let diceButton = document.getElementById("dice");
+  var diceButton = document.getElementById("dice");
 	diceButton.addEventListener("click", dice);
 })
 
@@ -10,9 +10,9 @@ function dice(){
 }
 
 function makeMove(fieldNr) {
-  let currentURL = window.location.href;
-  let color = document.getElementById(fieldNr).innerHTML
-  let hasToDice = document.getElementById("diceResult").innerHTML == "___"
+  var currentURL = window.location.href;
+  var color = document.getElementById(fieldNr).innerHTML
+  var hasToDice = document.getElementById("diceResult").innerHTML == "___"
   if (hasToDice) {
     alert("Bitte würfeln.");
     return;

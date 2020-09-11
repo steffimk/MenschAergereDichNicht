@@ -13,8 +13,8 @@ import Text.Julius (RawJS (..))
 import Controller.Actions
 import Control.Concurrent.STM
 import Model.Board
-import Model.GameInfo
 import Prelude
+import qualified Data.Text.Encoding as TE
 
 data MoveData = MoveData {colorString :: String, fieldNr :: Int} deriving (Generic, Show)
 instance ToJSON MoveData where
@@ -55,11 +55,14 @@ postGameR gameID = do
     moveData <- requireCheckJsonBody :: Handler MoveData
     master <- getYesod
     gameList <- liftIO $ readTVarIO $ games master
+    csrfToken <- lookupCookie $ TE.decodeUtf8 defaultCsrfCookieName :: Handler (Maybe Text)
     if elem gameID (map lobbyId gameList)
         then do
             let gameInfo = head $ filter (\x -> lobbyId x == gameID) gameList :: GameInfo
                 oldBoardState = boardState gameInfo :: BoardState
-                newBoardState = moveFigure (moveDataToFigure moveData) oldBoardState
+                newBoardState = if (isClientsTurn csrfToken gameInfo)
+                                    then moveFigure (moveDataToFigure moveData) oldBoardState
+                                    else oldBoardState
             liftIO $ Prelude.putStrLn (show newBoardState)
             let newGameList = (:) (GameInfo gameID newBoardState (colorMap gameInfo)) (filter (\x -> lobbyId x /= gameID) gameList) 
             liftIO $ atomically $ writeTVar (games master) newGameList
@@ -69,3 +72,9 @@ postGameR gameID = do
     --     let move = show $ moveData
     --     setTitle "Mensch ärgere Dich nicht"
     --     $(widgetFile "waitpage")
+
+isClientsTurn :: (Maybe Text) -> GameInfo -> Bool
+isClientsTurn Nothing      _                                = False
+isClientsTurn (Just token) (GameInfo _ boardState colorMap) = 
+    let turnToken = fst $ head $ filter (\x -> snd x == turn boardState) colorMap
+    in turnToken == token

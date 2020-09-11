@@ -12,9 +12,9 @@ module Foundation where
 
 import Control.Monad.Logger (LogSource)
 import Import.NoFoundation
+import Model.Board
 import Control.Concurrent.STM
 import Control.Monad.Logger        (LogSource)
-import Model.GameInfo
 import Text.Hamlet                 (hamletFile)
 import Text.Jasmine                (minifym)
 import Yesod.Core.Types            (Logger)
@@ -23,7 +23,7 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding   as TE
 
-
+data GameInfo = GameInfo {lobbyId :: String, boardState :: BoardState, colorMap :: [(CSRF_Token, Color)]}
 type CSRF_Token = Text
 
 data Lobby = Lobby { lobbyname :: Text, player_tokens :: [CSRF_Token] } deriving (Generic, Show)
