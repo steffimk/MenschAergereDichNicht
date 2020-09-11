@@ -11,29 +11,35 @@ rollTheDice = do
   randInt <- randomIO
   return ((mod randInt 6) + 1)
 
+-- Returns new modified boardState if move is valid, otherwise boardState is returned unchanged
 moveFigure :: Figure -> BoardState -> BoardState
+moveFigure _ (BoardState figs turn1 0) = BoardState figs turn1 0
 moveFigure figure boardState =
-  if not ((boardState^.diceResult > 0) && (isTurnOfColor (figure^.color) (boardState^.turn)) && (elem figure (boardState^.figures)))
+  if not ((isTurnOfColor (figure^.color) (boardState^.turn)) && (elem figure (boardState^.figures)))
     then boardState
     else if (isValidAction figure boardState)
       then let mNewField = getNewField figure boardState in
         case mNewField of
-          Nothing -> boardState -- Einfach unverändert zurückgeben
+          Nothing -> boardState
           Just _  -> newBoardState (fromJust mNewField) figure boardState
       else if canMakeAMove boardState
-            then boardState -- Einfach unverändert zurückgeben
-            else boardState {_turn = nextTurn boardState, _diceResult = 0}
+            then boardState
+            else setToFreshTurn boardState
 
 canMakeAMove :: BoardState -> Bool
 canMakeAMove boardState = foldl (||) False $ map (\x -> isValidAction x boardState) [f | f <- (_figures boardState), _color f == _turn boardState]
 
 newBoardState :: Field -> Figure -> BoardState ->  BoardState 
-newBoardState newField (Figure _ oldField) (BoardState figures1 turn1 diceRes) = 
-  let newBoardState1 = BoardState ((delete (Figure turn1 oldField) figures1) ++ [Figure turn1 newField]) (nextTurn (BoardState figures1 turn1 diceRes)) 0
+newBoardState newField oldFig oldBS = 
+  let newBoardState1 = adjustForNextRound (Figure (oldBS^.turn) newField) oldFig (setToFreshTurn oldBS)
   in if not (mHitColor == Nothing)
-        then BoardState ((delete (Figure (fromJust mHitColor) newField) (_figures newBoardState1)) ++ [Figure (fromJust mHitColor) Start]) (_turn newBoardState1) 0
+        then adjustForNextRound (Figure (fromJust mHitColor) Start) (Figure (fromJust mHitColor) newField) newBoardState1
         else newBoardState1
-  where mHitColor = getHitColor newField turn1 figures1
+  where mHitColor = getHitColor newField oldBS
+
+adjustForNextRound :: Figure -> Figure -> BoardState -> BoardState
+adjustForNextRound toAdd toDelete boardState = 
+  over figures (\x -> toAdd : (delete toDelete x)) boardState
 
 isValidAction :: Figure -> BoardState -> Bool
 -- check if valid when 6 got diced
@@ -84,11 +90,11 @@ isOccupiedByOwnFigure :: Field -> Color -> [Figure] -> Bool
 isOccupiedByOwnFigure Start    _      _        = False
 isOccupiedByOwnFigure newField color1 figures1 = elem (Figure color1 newField) figures1
 
-getHitColor :: Field -> Color -> [Figure] -> Maybe Color
-getHitColor Start    _      _       = Nothing
-getHitColor (Home _) _      _       = Nothing
-getHitColor newField turn1 figures1   = 
-  let hitList = [ _color x | x <- figures1, _currentField x == newField, _color x /= turn1]
+getHitColor :: Field -> BoardState -> Maybe Color
+getHitColor Start    _     = Nothing
+getHitColor (Home _) _     = Nothing
+getHitColor newField bs    = 
+  let hitList =  [ x^.color | x <- bs^.figures, x^.currentField == newField, x^.color /= bs^.turn]
   in if hitList == []
       then Nothing
       else Just (hitList!!0)

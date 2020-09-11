@@ -69,6 +69,9 @@ intToField x
   | elem x [52..55] = Home x
   | otherwise       = Standard x
 
+setToFreshTurn :: BoardState -> BoardState
+setToFreshTurn boardState = set turn (nextTurn boardState) (set diceResult 0 boardState)
+
 nextTurn :: BoardState -> Color
 nextTurn (BoardState _        color1 6) = color1   
 nextTurn (BoardState figures1 Yellow _) = getNextColor figures1 [Green ..]

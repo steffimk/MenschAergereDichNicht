@@ -8,7 +8,7 @@
 module Handler.Game where
 import Data.Aeson
 import GHC.Generics
-import Import hiding (map, head, elem, fst, snd, filter, atomically, readTVarIO, writeTVar, (++))
+import Import hiding (map, head, elem, fst, snd, filter, atomically, readTVarIO, writeTVar, (++), (.))
 import Text.Julius (RawJS (..))
 import Controller.Actions
 import Control.Concurrent.STM
@@ -38,8 +38,8 @@ getGameR gameID = do
                 dice = if oldBS^.diceResult > 0 then oldBS^.diceResult else newDice
                 figs = oldBS^.figures
             if oldBS^.diceResult == 0
-                then let newBS = oldBS {_diceResult = dice}
-                         newGameList = (:) (GameInfo gameID newBS (_colorMap gameInfo)) (filter (\x -> _lobbyId x /= gameID) gameList)
+                then let newGameInfo = set (boardState.diceResult) dice gameInfo
+                         newGameList = (:) newGameInfo (filter (\x -> _lobbyId x /= gameID) gameList)
                      in do liftIO $ atomically $ writeTVar (games master) newGameList
                 else do return ()
             defaultLayout $ do
@@ -66,7 +66,7 @@ postGameR gameID = do
                 --                     else oldBS
                 newBS = moveFigure (moveDataToFigure moveData) oldBS :: BoardState
             liftIO $ Prelude.putStrLn (show newBS)
-            let newGameList = (:) (GameInfo gameID newBS (_colorMap gameInfo)) (filter (\x -> _lobbyId x /= gameID) gameList) 
+            let newGameList = (:) (set boardState newBS gameInfo) (filter (\x -> _lobbyId x /= gameID) gameList) 
             liftIO $ atomically $ writeTVar (games master) newGameList
             returnJson moveData
         else returnJson moveData
