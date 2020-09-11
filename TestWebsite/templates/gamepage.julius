@@ -6,16 +6,17 @@ document.addEventListener("DOMContentLoaded", function(){
 
 function dice(){
   console.log("Dice function called")
-  document.getElementById("diceResult").innerHTML = getRandomInt(7)
-}
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
+  document.getElementById("diceResult").innerHTML = "#{rawJS diceRes}"
 }
 
 function makeMove(fieldNr) {
   let currentURL = window.location.href;
   let color = document.getElementById(fieldNr).innerHTML
+  let hasToDice = document.getElementById("diceResult").innerHTML == "___"
+  if (hasToDice) {
+    alert("Bitte würfeln.");
+    return;
+  }
   if (color == "___") {
     alert("Drücke auf die Figur, die bewegt werden soll.");
     return;

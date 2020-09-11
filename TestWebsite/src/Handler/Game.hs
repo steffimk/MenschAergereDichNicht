@@ -36,12 +36,13 @@ getGameR gameID = do
                 dice = if diceResult oldBoardState > 0 then (diceResult oldBoardState) else newDice
                 figs = figures oldBoardState
                 color = turn oldBoardState
-            if diceResult oldBoardState == 0 
+            if diceResult oldBoardState == 0
                 then let newBoardState = oldBoardState {diceResult = dice}
                          newGameList = (:) (GameInfo gameID newBoardState (colorMap gameInfo)) (filter (\x -> lobbyId x /= gameID) gameList)
                      in do liftIO $ atomically $ writeTVar (games master) newGameList
                 else do return ()
             defaultLayout $ do
+                let diceRes = show $ dice
                 setTitle "Mensch ärgere Dich nicht"
                 $(widgetFile "gamepage")
         else 

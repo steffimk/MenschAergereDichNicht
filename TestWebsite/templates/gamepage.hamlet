@@ -1,13 +1,11 @@
 <div>
   <h1>Mensch ärgere Dich nicht
-  <p>GameID: #{gameID}
-  <h2>#{showGerman $ turn oldBoardState} ist am Zug
+  <h4>#{showGerman $ turn oldBoardState} ist am Zug
   <table>
     <tr>
       <td>
         <button #dice>Würfeln
-      <td #diceResult>#{dice}
-      <td>Drücke auf die Figur, die du bewegen möchtest.
+      <td #diceResult>___
   <table>
     <tr>
       <td .greenField><a href="javascript:makeMove(-22)" id="-22">#{getGUIString -22 figs}
@@ -141,3 +139,4 @@
       <td> 
       <td .redField><a href="javascript:makeMove(-41)" id="-41">#{getGUIString -41 figs}
       <td .redField><a href="javascript:makeMove(-40)" id="-40">#{getGUIString -40 figs}
+  <h4>Drücke auf die Figur, die du bewegen möchtest.
