@@ -12,7 +12,9 @@ import Import hiding (map, head, elem, fst, snd, filter, atomically, readTVarIO,
 import Text.Julius (RawJS (..))
 import Controller.Actions
 import Control.Concurrent.STM
+import Control.Lens
 import Model.Board
+import Model.LobbyModel
 import Prelude
 import qualified Data.Text.Encoding as TE
 
@@ -22,23 +24,22 @@ instance ToJSON MoveData where
 instance FromJSON MoveData
 
 moveDataToFigure :: MoveData -> Figure
-moveDataToFigure (MoveData colorString fieldNr) = Figure (stringToColor colorString) (intToField fieldNr)
+moveDataToFigure (MoveData colorStr fieldNr) = Figure (stringToColor colorStr) (intToField fieldNr)
 
 getGameR :: String -> Handler Html
 getGameR gameID = do
     master <- getYesod
     gameList <- liftIO $ Control.Concurrent.STM.readTVarIO $ games master
-    if elem gameID (map lobbyId gameList)
+    if elem gameID (map _lobbyId gameList)
         then do
             newDice <- liftIO $ rollTheDice
-            let gameInfo = head $ filter (\x -> lobbyId x == gameID) gameList :: GameInfo
-                oldBoardState = boardState gameInfo :: BoardState
-                dice = if diceResult oldBoardState > 0 then (diceResult oldBoardState) else newDice
-                figs = figures oldBoardState
-                color = turn oldBoardState
-            if diceResult oldBoardState == 0
-                then let newBoardState = oldBoardState {diceResult = dice}
-                         newGameList = (:) (GameInfo gameID newBoardState (colorMap gameInfo)) (filter (\x -> lobbyId x /= gameID) gameList)
+            let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
+                oldBS = gameInfo^.boardState :: BoardState
+                dice = if oldBS^.diceResult > 0 then oldBS^.diceResult else newDice
+                figs = oldBS^.figures
+            if oldBS^.diceResult == 0
+                then let newBS = oldBS {_diceResult = dice}
+                         newGameList = (:) (GameInfo gameID newBS (_colorMap gameInfo)) (filter (\x -> _lobbyId x /= gameID) gameList)
                      in do liftIO $ atomically $ writeTVar (games master) newGameList
                 else do return ()
             defaultLayout $ do
@@ -56,25 +57,22 @@ postGameR gameID = do
     master <- getYesod
     gameList <- liftIO $ readTVarIO $ games master
     csrfToken <- lookupCookie $ TE.decodeUtf8 defaultCsrfCookieName :: Handler (Maybe Text)
-    if elem gameID (map lobbyId gameList)
+    if elem gameID (map _lobbyId gameList)
         then do
-            let gameInfo = head $ filter (\x -> lobbyId x == gameID) gameList :: GameInfo
-                oldBoardState = boardState gameInfo :: BoardState
-                newBoardState = if (isClientsTurn csrfToken gameInfo)
-                                    then moveFigure (moveDataToFigure moveData) oldBoardState
-                                    else oldBoardState
-            liftIO $ Prelude.putStrLn (show newBoardState)
-            let newGameList = (:) (GameInfo gameID newBoardState (colorMap gameInfo)) (filter (\x -> lobbyId x /= gameID) gameList) 
+            let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
+                oldBS = _boardState gameInfo :: BoardState
+                -- newBS = if (isClientsTurn csrfToken gameInfo)
+                --                     then moveFigure (moveDataToFigure moveData) oldBS
+                --                     else oldBS
+                newBS = moveFigure (moveDataToFigure moveData) oldBS :: BoardState
+            liftIO $ Prelude.putStrLn (show newBS)
+            let newGameList = (:) (GameInfo gameID newBS (_colorMap gameInfo)) (filter (\x -> _lobbyId x /= gameID) gameList) 
             liftIO $ atomically $ writeTVar (games master) newGameList
             returnJson moveData
         else returnJson moveData
-    -- defaultLayout $ do
-    --     let move = show $ moveData
-    --     setTitle "Mensch ärgere Dich nicht"
-    --     $(widgetFile "waitpage")
 
 isClientsTurn :: (Maybe Text) -> GameInfo -> Bool
 isClientsTurn Nothing      _                                = False
-isClientsTurn (Just token) (GameInfo _ boardState colorMap) = 
-    let turnToken = fst $ head $ filter (\x -> snd x == turn boardState) colorMap
+isClientsTurn (Just token) (GameInfo _ boardState1 colorMap) = 
+    let turnToken = fst $ head $ filter (\x -> snd x == _turn boardState1) colorMap
     in turnToken == token

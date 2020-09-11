@@ -1,6 +1,6 @@
 <div>
   <h1>Mensch ärgere Dich nicht
-  <h4>#{showGerman $ turn oldBoardState} ist am Zug
+  <h4>#{showGerman $ _turn oldBS} ist am Zug
   <table>
     <tr>
       <td>

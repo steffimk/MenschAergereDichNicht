@@ -1,5 +1,4 @@
-.masthead,
-.navbar {
+.masthead {
     background-color: rgb(27, 28, 29);
 }
 

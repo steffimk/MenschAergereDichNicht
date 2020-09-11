@@ -13,6 +13,7 @@ module Foundation where
 import Control.Monad.Logger (LogSource)
 import Import.NoFoundation
 import Model.Board
+import Model.LobbyModel
 import Control.Concurrent.STM
 import Control.Monad.Logger        (LogSource)
 import Text.Hamlet                 (hamletFile)
@@ -23,20 +24,6 @@ import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding   as TE
 
-data GameInfo = GameInfo {lobbyId :: String, boardState :: BoardState, colorMap :: [(CSRF_Token, Color)]}
-type CSRF_Token = Text
-
-data Lobby = Lobby { lobbyname :: Text, player_tokens :: [CSRF_Token] } deriving (Generic, Show)
-instance FromJSON Lobby
-instance ToJSON Lobby
-
-data LobbyToJoin = LobbyToJoin { lobbynameToJoin :: Text, players_token :: CSRF_Token } deriving (Generic, Show)
-instance FromJSON LobbyToJoin
-instance ToJSON LobbyToJoin
-
-data LobbyToLeave = LobbyToLeave { lobbynameToLeave :: Text, leaving_players_token :: CSRF_Token } deriving (Generic, Show)
-instance FromJSON LobbyToLeave
-instance ToJSON LobbyToLeave
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -50,16 +37,6 @@ data App = App
     , openLobbiesMaster :: TVar [Lobby]
     , games             :: TVar [GameInfo]
     }
-
-data MenuItem = MenuItem
-    { menuItemLabel          :: Text
-    , menuItemRoute          :: Route App
-    , menuItemAccessCallback :: Bool
-    }
-
-data MenuTypes
-    = NavbarLeft MenuItem
-    | NavbarRight MenuItem
 
 -- This is where we define all of the routes in our application. For a full
 -- explanation of the syntax, please see:
@@ -113,24 +90,6 @@ instance Yesod App where
 
         mcurrentRoute <- getCurrentRoute
 
-        -- Get the breadcrumbs, as defined in the YesodBreadcrumbs instance.
-        (title, parents) <- breadcrumbs
-
-        -- Define the menu items of the header.
-        let menuItems =
-                [ NavbarLeft $ MenuItem
-                    { menuItemLabel = "Home"
-                    , menuItemRoute = HomeR
-                    , menuItemAccessCallback = True
-                    }
-                ]
-
-        let navbarLeftMenuItems = [x | NavbarLeft x <- menuItems]
-        let navbarRightMenuItems = [x | NavbarRight x <- menuItems]
-
-        let navbarLeftFilteredMenuItems = [x | x <- navbarLeftMenuItems, menuItemAccessCallback x]
-        let navbarRightFilteredMenuItems = [x | x <- navbarRightMenuItems, menuItemAccessCallback x]
-
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
         -- default-layout-wrapper is the entire page. Since the final
@@ -152,30 +111,6 @@ instance Yesod App where
     -- Default to Authorized for now.
     isAuthorized _ _        = return Authorized
 
-    -- This function creates static content files in the static folder
-    -- and names them based on a hash of their content. This allows
-    -- expiration dates to be set far in the future without worry of
-    -- users receiving stale content.
-    addStaticContent
-        :: Text  -- ^ The file extension
-        -> Text -- ^ The MIME content type
-        -> LByteString -- ^ The contents of the file
-        -> Handler (Maybe (Either Text (Route App, [(Text, Text)])))
-    addStaticContent ext mime content = do
-        master <- getYesod
-        let staticDir = appStaticDir $ appSettings master
-        addStaticContentExternal
-            minifym
-            genFileName
-            staticDir
-            (StaticR . flip StaticRoute [])
-            ext
-            mime
-            content
-      where
-        -- Generate a unique filename based on the content itself
-        genFileName lbs = "autogen-" ++ base64md5 lbs
-
     -- What messages should be logged. The following includes all messages when
     -- in development, and warnings and errors in production.
     shouldLogIO :: App -> LogSource -> LogLevel -> IO Bool
@@ -187,17 +122,6 @@ instance Yesod App where
 
     makeLogger :: App -> IO Logger
     makeLogger = return . appLogger
-
--- Define breadcrumbs.
-instance YesodBreadcrumbs App where
-    -- Takes the route that the user is currently on, and returns a tuple
-    -- of the 'Text' that you want the label to display, and a previous
-    -- breadcrumb route.
-    breadcrumb
-        :: Route App  -- ^ The route the user is visiting currently.
-        -> Handler (Text, Maybe (Route App))
-    breadcrumb HomeR = return ("Home", Nothing)
-    breadcrumb  _    = return ("home", Nothing)
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.

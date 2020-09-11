@@ -6,6 +6,7 @@ import           Control.Monad.State
 import           Data.Aeson
 import           Data.List
 import           Import
+import Model.LobbyModel
 import           Prelude             hiding ((++))
 
 addLobby :: Lobby -> [Lobby] -> [Lobby]

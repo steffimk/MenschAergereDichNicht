@@ -35,6 +35,7 @@ import Network.Wai.Middleware.RequestLogger (Destination (Logger),
                                              OutputFormat (..), destination,
                                              mkRequestLogger, outputFormat)
 import Model.Board
+import Model.LobbyModel
 import System.Log.FastLogger                (defaultBufSize, newStdoutLoggerSet,
                                              toLogStr)
 

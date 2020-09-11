@@ -1,27 +1,38 @@
+{-# LANGUAGE TemplateHaskell   #-}
 module Model.Board where
 
 import Prelude
+import Control.Lens
 
 data Color = Yellow | Green | Blue | Red deriving (Eq, Enum)
 
+instance Show Color where
+  show Yellow = "Y"
+  show Green = "G"
+  show Blue = "B"
+  show Red = "R"
 data Figure = Figure {
-                color  :: Color,
-                currentField :: Field
+                _color  :: Color,
+                _currentField :: Field
               } deriving (Eq, Show)
 
 data Field = Standard Int | Start | Home Int | First Int deriving (Eq, Show)
 
 data BoardState = BoardState {
-              figures    :: [Figure],
-              turn       :: Color,
-              diceResult :: Int
+              _figures    :: [Figure],
+              _turn       :: Color,
+              _diceResult :: Int
       } deriving (Eq, Show)
+
+$(makeLenses ''Figure)
+$(makeLenses ''Model.Board.Field)
+$(makeLenses ''BoardState)
 
 initNewBoardState :: BoardState
 initNewBoardState = BoardState ((initFigures Yellow)++(initFigures Green)++(initFigures Blue)++(initFigures Red)) Yellow 0
 
 initFigures :: Color -> [Figure]
-initFigures color1 = [Figure color1 Start | x <- [0..3]]
+initFigures color1 = [Figure color1 Start | _ <- [0..3]]
 
 getBoardOffset :: Color -> Int
 getBoardOffset color1 = 
@@ -73,17 +84,11 @@ getNextColor figures1 colors =
        else head colorsInGame
 
 hasFinishedGame :: [Figure] -> Color -> Bool
-hasFinishedGame figures1 color1 = foldl (&&) True (map isFigureHome [f | f <- figures1, (color f) == color1])
+hasFinishedGame figures1 color1 = foldl (&&) True (map isFigureHome [f | f <- figures1, (_color f) == color1])
 
 isFigureHome :: Figure -> Bool
 isFigureHome (Figure _ (Home _)) = True
 isFigureHome _                   = False
-
-instance Show Color where
-  show Yellow = "Y"
-  show Green = "G"
-  show Blue = "B"
-  show Red = "R"
 
 showGerman :: Color -> String
 showGerman Yellow = "Gelb"
