@@ -18,8 +18,15 @@ function refreshOpenLobbies(){
     success: function (data) {
       console.log(data);
       var csrfToken = Cookies.get(csrfCookieName);
+
+      var inFullLobby = false;
       data.forEach(function(lobby) {
+        if (inFullLobby) {
+          return;
+        }
         if ((lobby.player_tokens.length === 4) && (lobby.player_tokens.includes(csrfToken))){
+          inFullLobby = true;
+
           document.getElementById("#{rawJS lobbyListId}").innerHTML="";
           var newNode = $ ("<li></li>");
           var startGameButton = document.createElement("button");
@@ -28,12 +35,11 @@ function refreshOpenLobbies(){
           startGameButton.style.background='#808080'
           newNode.append(startGameButton);
           $("##{rawJS lobbyListId}").append(newNode);
-          return;
         } else {
           var newNode = $("<li></li>");
           newNode.text("lobbyname: " + lobby.lobbyname + "\nplayers: [" + lobby.player_tokens.length + "/4]");
 
-          if (!lobby.player_tokens.includes(csrfToken)) {
+          if (!lobby.player_tokens.includes(csrfToken) && ((lobby.player_tokens.length <= 3))) {
             var joinButton = document.createElement("button");
             joinButton.style.color = "white";
             joinButton.innerHTML = "Join";
@@ -65,34 +71,36 @@ function refreshOpenLobbies(){
             });
             newNode.append(joinButton);
           } else {
-            var leaveButton = document.createElement("button");
-            leaveButton.style.color = "white";
-            leaveButton.innerHTML = "Leave";
-            leaveButton.style.background='#800000';
-            leaveButton.addEventListener('click', function(e) {
-              e.preventDefault();
-              $.ajax({
-                url: '@{LeaveLobbyR}',
-                type: 'POST',
-                contentType: "application/json",
-                data: JSON.stringify({
-                  lobbynameToLeave: lobby.lobbyname,
-                  leaving_players_token: csrfToken,
-                }),
-                success: function (data) {
-                  if (data.lobbynameToLeave === "") {
-                    alert("Can't leave a full lobby.");
+            if (lobby.player_tokens.includes(csrfToken)) {
+              var leaveButton = document.createElement("button");
+              leaveButton.style.color = "white";
+              leaveButton.innerHTML = "Leave";
+              leaveButton.style.background='#800000';
+              leaveButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                $.ajax({
+                  url: '@{LeaveLobbyR}',
+                  type: 'POST',
+                  contentType: "application/json",
+                  data: JSON.stringify({
+                    lobbynameToLeave: lobby.lobbyname,
+                    leaving_players_token: csrfToken,
+                  }),
+                  success: function (data) {
+                    if (data.lobbynameToLeave === "") {
+                      alert("Can't leave a full lobby.");
+                      refreshOpenLobbies();
+                    }
+                    console.log("leaving lobby: " + data),
                     refreshOpenLobbies();
+                  },
+                  error: function(data) {
+                    console.log("Error leaving lobby: " + lobby.lobbyname);
+                    console.log("Player token: " + data.leaving_players_token);
                   }
-                  console.log("leaving lobby: " + data),
-                  refreshOpenLobbies();
-                },
-                error: function(data) {
-                  console.log("Error leaving lobby: " + lobby.lobbyname);
-                  console.log("Player token: " + data.leaving_players_token);
-                }
+                })
               })
-            })
+            }
             newNode.append(leaveButton);
           }
 

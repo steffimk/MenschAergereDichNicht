@@ -10,33 +10,18 @@
 
 module Foundation where
 
-import Control.Monad.Logger (LogSource)
-import Import.NoFoundation
-import Control.Concurrent.STM
-import Control.Monad.Logger        (LogSource)
-import Model.Board
-import Text.Hamlet                 (hamletFile)
-import Text.Jasmine                (minifym)
-import Yesod.Core.Types            (Logger)
-import Yesod.Default.Util          (addStaticContentExternal)
-import qualified Yesod.Core.Unsafe as Unsafe
-import qualified Data.CaseInsensitive as CI
-import qualified Data.Text.Encoding   as TE
-
-
-type CSRF_Token = Text
-
-data Lobby = Lobby { lobbyname :: Text, player_tokens :: [CSRF_Token] } deriving (Generic, Show)
-instance FromJSON Lobby
-instance ToJSON Lobby
-
-data LobbyToJoin = LobbyToJoin { lobbynameToJoin :: Text, players_token :: CSRF_Token } deriving (Generic, Show)
-instance FromJSON LobbyToJoin
-instance ToJSON LobbyToJoin
-
-data LobbyToLeave = LobbyToLeave { lobbynameToLeave :: Text, leaving_players_token :: CSRF_Token } deriving (Generic, Show)
-instance FromJSON LobbyToLeave
-instance ToJSON LobbyToLeave
+import           Control.Concurrent.STM
+import           Control.Monad.Logger   (LogSource)
+import qualified Data.CaseInsensitive   as CI
+import qualified Data.Text.Encoding     as TE
+import           Import.NoFoundation
+import           Model.Board
+import           Model.LobbyModel
+import           Text.Hamlet            (hamletFile)
+import           Text.Jasmine           (minifym)
+import           Yesod.Core.Types       (Logger)
+import qualified Yesod.Core.Unsafe      as Unsafe
+import           Yesod.Default.Util     (addStaticContentExternal)
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
