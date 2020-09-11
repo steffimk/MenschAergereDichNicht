@@ -15,7 +15,7 @@ import           Control.Monad.Logger   (LogSource)
 import qualified Data.CaseInsensitive   as CI
 import qualified Data.Text.Encoding     as TE
 import           Import.NoFoundation
-import           Model.Board
+import           Model.GameInfo
 import           Model.LobbyModel
 import           Text.Hamlet            (hamletFile)
 import           Text.Jasmine           (minifym)
@@ -33,7 +33,7 @@ data App = App
     , appHttpManager    :: Manager
     , appLogger         :: Logger
     , openLobbiesMaster :: TVar [Lobby]
-    , games             :: TVar [(String, BoardState)]
+    , games             :: TVar [GameInfo]
     }
 
 data MenuItem = MenuItem

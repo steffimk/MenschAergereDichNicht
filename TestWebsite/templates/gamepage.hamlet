@@ -1,12 +1,12 @@
 <div>
   <h1>Mensch ärgere Dich nicht
   <p>GameID: #{gameID}
-  <h2>#{showGerman $ turn boardState} ist am Zug
+  <h2>#{showGerman $ turn oldBoardState} ist am Zug
   <table>
     <tr>
       <td>
         <button #dice>Würfeln
-      <td #diceResult>___
+      <td #diceResult>#{dice}
       <td>Drücke auf die Figur, die du bewegen möchtest.
   <table>
     <tr>

@@ -4,7 +4,7 @@
 {-# LANGUAGE RecordWildCards       #-}
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-orphans  #-}
 {-# LANGUAGE ViewPatterns          #-}
 
 module Application
@@ -25,6 +25,7 @@ import           Control.Monad.Logger                 (liftLoc)
 import           Import
 import           Language.Haskell.TH.Syntax           (qLocation)
 import           Model.Board
+import           Model.GameInfo
 import           Network.HTTP.Client.TLS              (getGlobalManager)
 import           Network.Wai                          (Middleware)
 import           Network.Wai.Handler.Warp             (Settings,
@@ -70,7 +71,7 @@ makeFoundation appSettings = do
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
     openLobbiesMaster <- Control.Concurrent.STM.newTVarIO []
-    games <- Control.Concurrent.STM.newTVarIO [("s", initNewBoardState)]
+    games <- Control.Concurrent.STM.newTVarIO [GameInfo "s" initNewBoardState []]
 
     -- Return the foundation
     return App {..}

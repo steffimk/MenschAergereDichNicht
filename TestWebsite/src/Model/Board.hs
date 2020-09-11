@@ -12,12 +12,13 @@ data Figure = Figure {
 data Field = Standard Int | Start | Home Int | First Int deriving (Eq, Show)
 
 data BoardState = BoardState {
-              figures :: [Figure],
-              turn        :: Color
-      } deriving Show
+              figures    :: [Figure],
+              turn       :: Color,
+              diceResult :: Int
+      } deriving (Eq, Show)
 
 initNewBoardState :: BoardState
-initNewBoardState = BoardState ((initFigures Yellow)++(initFigures Green)++(initFigures Blue)++(initFigures Red)) Yellow -- TODO: immer gelb?
+initNewBoardState = BoardState ((initFigures Yellow)++(initFigures Green)++(initFigures Blue)++(initFigures Red)) Yellow 0
 
 initFigures :: Color -> [Figure]
 initFigures color1 = [Figure color1 Start | x <- [0..3]]
@@ -57,18 +58,18 @@ intToField x
   | elem x [52..55] = Home x
   | otherwise       = Standard x
 
-nextTurn :: [Figure] -> Color -> Int -> Color
-nextTurn _        color1 6 = color1     
-nextTurn figures1 Yellow _ = getNextColor figures1 [Green ..]
-nextTurn figures1 Green  _ = getNextColor figures1 [Blue, Red, Yellow]
-nextTurn figures1 Blue   _ = getNextColor figures1 [Red, Yellow, Green]
-nextTurn figures1 Red    _ = getNextColor figures1 [Yellow, Green, Blue]
+nextTurn :: BoardState -> Color
+nextTurn (BoardState _        color1 6) = color1   
+nextTurn (BoardState figures1 Yellow _) = getNextColor figures1 [Green ..]
+nextTurn (BoardState figures1 Green  _) = getNextColor figures1 [Blue, Red, Yellow]
+nextTurn (BoardState figures1 Blue   _) = getNextColor figures1 [Red, Yellow, Green]
+nextTurn (BoardState figures1 Red    _) = getNextColor figures1 [Yellow, Green, Blue]
 
 getNextColor :: [Figure] -> [Color] -> Color
 getNextColor figures1 colors =
   let colorsInGame = [ c | c <- colors, (hasFinishedGame figures1 c) == False]
   in if null colorsInGame
-       then Yellow -- TODO
+       then Yellow -- TODO: Game Ended
        else head colorsInGame
 
 hasFinishedGame :: [Figure] -> Color -> Bool
