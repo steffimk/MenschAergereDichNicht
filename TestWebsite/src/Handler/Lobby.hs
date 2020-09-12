@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Handler.Lobby where
 
+import           Control.Monad.Par
 import           Control.Monad.State
 import           Data.Aeson
 import           Data.List
@@ -72,7 +73,6 @@ postJoinLobbyR :: Handler Value
 postJoinLobbyR = do
     lobbyToJoin <- requireCheckJsonBody :: Handler LobbyToJoin
     master <- getYesod
-    token <- lookupCookie "XSRF-TOKEN"
     atomically (
         do
         openLobbies <- readTVar $ openLobbiesMaster master
@@ -93,13 +93,21 @@ postJoinLobbyR = do
                         in do { writeTVar (openLobbiesMaster master) lobbies;
                                 writeTVar (games master) (openGames Data.List.++ [newOpenGame]) }
 
-        case (doesLobbyWithPlayerExist (players_token lobbyToJoin) (lobbynameToJoin lobbyToJoin) newLobbies) || (not (doesGameWithPlayerExist token openGames)) of
-            True -> returnJson lobbyToJoin
-            _    -> returnJson LobbyToJoin { lobbynameToJoin="", players_token="" }
+        let lobbyOrGameWithPlayerExists = runPar (doesLobbyOrGameWithPlayerExist (players_token lobbyToJoin) (lobbynameToJoin lobbyToJoin) newLobbies openGames)
+        case lobbyOrGameWithPlayerExists of
+                True -> returnJson lobbyToJoin
+                _    -> returnJson LobbyToJoin { lobbynameToJoin="", players_token="" }
         )
 
--- getLobbyFromMaybeLobby :: Maybe Lobby -> Lobby
-
+doesLobbyOrGameWithPlayerExist :: CSRF_Token -> Text -> [Lobby] -> [GameInfo] -> Par (Bool)
+doesLobbyOrGameWithPlayerExist pt ln openLobbies openGames = do
+    lobbyExists <- new
+    gameExists <- new
+    fork $ Control.Monad.Par.put lobbyExists $ doesLobbyWithPlayerExist pt ln openLobbies
+    fork $ Control.Monad.Par.put gameExists $ doesGameWithPlayerExist (Just pt) openGames
+    lobbyVal <- Control.Monad.Par.get lobbyExists
+    gameVal <- Control.Monad.Par.get gameExists
+    return (lobbyVal || (not gameVal))
 
 isMaybeLobbyFull :: (Maybe Lobby) -> Bool
 isMaybeLobbyFull maybeLobby = do
@@ -165,8 +173,18 @@ getLobbyOrGameExistsR lnToCheckString = do
         let lnToCheckText = pack' lnToCheckString
             getLnFromOpenLobbies lobby = (lobbyname lobby)
             getLnFromGames game = (lobbyId game)
-            in returnJson ((Prelude.elem lnToCheckText (Prelude.map getLnFromOpenLobbies openLobbies) || Prelude.elem lnToCheckString (Prelude.map getLnFromGames openGames)))
+            in returnJson (runPar (lobbynameExists lnToCheckText getLnFromOpenLobbies openLobbies getLnFromGames openGames))
         )
+
+lobbynameExists :: Text -> (Lobby -> CSRF_Token) -> [Lobby] -> (GameInfo -> String) -> [GameInfo] -> Par (Bool)
+lobbynameExists ln lnFromLobbyFunc lobbies lnFromGamesFunc gamesList = do
+    nameExistsInLobby <- new
+    nameExistsInGame <- new
+    fork $ Control.Monad.Par.put nameExistsInLobby $ Prelude.elem ln (Prelude.map lnFromLobbyFunc lobbies)
+    fork $ Control.Monad.Par.put nameExistsInGame $ Prelude.elem (unpack ln) (Prelude.map lnFromGamesFunc gamesList)
+    nameInLobby <- Control.Monad.Par.get nameExistsInLobby
+    nameInGame <- Control.Monad.Par.get nameExistsInLobby
+    return (nameInLobby || nameInGame)
 
 getPlayersGameIdR :: Handler Value
 getPlayersGameIdR = do
