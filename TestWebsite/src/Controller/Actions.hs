@@ -27,7 +27,7 @@ moveFigure figure boardState =
             else setToFreshTurn boardState
 
 canMakeAMove :: BoardState -> Bool
-canMakeAMove boardState = foldl (||) False $ map (\x -> isValidAction x boardState) [f | f <- (_figures boardState), _color f == _turn boardState]
+canMakeAMove boardState = foldl (||) False $ map (\x -> isValidAction x boardState && getNewField x boardState /= Nothing) [f | f <- (_figures boardState), _color f == _turn boardState]
 
 newBoardState :: Field -> Figure -> BoardState ->  BoardState 
 newBoardState newField oldFig oldBS = 

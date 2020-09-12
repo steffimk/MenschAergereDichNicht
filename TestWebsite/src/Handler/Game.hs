@@ -61,10 +61,10 @@ postGameR gameID = do
         then do
             let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
                 oldBS = _boardState gameInfo :: BoardState
-                -- newBS = if (isClientsTurn csrfToken gameInfo)
-                --                     then moveFigure (moveDataToFigure moveData) oldBS
-                --                     else oldBS
-                newBS = moveFigure (moveDataToFigure moveData) oldBS :: BoardState
+                newBS = if (isClientsTurn csrfToken gameInfo)
+                                    then moveFigure (moveDataToFigure moveData) oldBS
+                                    else oldBS
+                -- newBS = moveFigure (moveDataToFigure moveData) oldBS :: BoardState
             liftIO $ Prelude.putStrLn (show newBS)
             let newGameList = (:) (set boardState newBS gameInfo) (filter (\x -> _lobbyId x /= gameID) gameList) 
             liftIO $ atomically $ writeTVar (games master) newGameList
