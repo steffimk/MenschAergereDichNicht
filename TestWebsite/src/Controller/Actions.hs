@@ -20,7 +20,7 @@ moveFigure figure boardState =
     else if (isValidAction figure boardState)
       then let mNewField = getNewField figure boardState in
         case mNewField of
-          Nothing -> boardState
+          Nothing -> if canMakeAMove boardState then boardState else setToFreshTurn boardState
           Just _  -> newBoardState (fromJust mNewField) figure boardState
       else if canMakeAMove boardState
             then boardState

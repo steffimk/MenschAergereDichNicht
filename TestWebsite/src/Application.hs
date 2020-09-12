@@ -66,8 +66,9 @@ makeFoundation appSettings = do
         (if appMutableStatic appSettings then staticDevel else static)
         (appStaticDir appSettings)
     openLobbiesMaster <- Control.Concurrent.STM.newTVarIO []
-    games <- Control.Concurrent.STM.newTVarIO [] --[GameInfo "s" initNewBoardState [(pack "LfEKZGkP7D", Yellow), (pack "LfEKZGkP7D", Green), (pack "LfEKZGkP7D", Blue), (pack "LfEKZGkP7D", Red)]]
-
+    games <- Control.Concurrent.STM.newTVarIO []
+    -- Testing: games <- Control.Concurrent.STM.newTVarIO [GameInfo "s" initNewBoardState [(pack "LfEKZGkP7D", Yellow), (pack "LfEKZGkP7D", Green), (pack "LfEKZGkP7D", Blue), (pack "LfEKZGkP7D", Red)]]
+    
     -- Return the foundation
     return App {..}
 

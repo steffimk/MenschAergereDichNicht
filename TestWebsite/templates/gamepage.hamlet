@@ -1,22 +1,26 @@
 <div>
-  <h1>Mensch ärgere Dich nicht
+  <h2>Mensch ärgere Dich nicht
+  <a href=@{GameR gameID}>Bitte lade die Seite regelmäßig neu.
   $if isTurnOfClient
-    <h4>Du bist am Zug.
+    <h4>Du bist am Zug und spielst mit #{showGerman ownColor}.
   $else
-    <h4>#{showGerman $ _turn oldBS} ist am Zug.
+    <h4>#{showGerman $ _turn oldBS} ist am Zug. Du spielst mit #{showGerman ownColor}.
   <table>
     <tr>
-      <td><button #dice>Würfeln
-      <td #diceResult>___
-      <td>
-      <td>
-      <td>Du spielst mit #{showGerman ownColor}.
-      <td>
-      <td><a href=@{GameR gameID}>Refresh die Seite.
+      $if isTurnOfClient
+        <td>
+          <button #dice>Würfeln
+        $if hasToDice
+          <td #diceResult>___
+        $else
+          <td #diceResult>#{diceRes}
+      $else 
+        <td>
+
   <table>
     <tr>
-      <td .greenField><a href="javascript:makeMove(-22)" id="-22">#{getGUIString -22 figs}
       <td .greenField><a href="javascript:makeMove(-23)" id="-23">#{getGUIString -23 figs}
+      <td .greenField><a href="javascript:makeMove(-22)" id="-22">#{getGUIString -22 figs}
       <td>
       <td>
       <td .standardField><a href="javascript:makeMove(22)" id="22">#{getGUIString 22 figs}
@@ -24,8 +28,8 @@
       <td .blueField><a href="javascript:makeMove(28)" id="28">#{getGUIString 28 figs}
       <td> 
       <td>
-      <td .blueField><a href="javascript:makeMove(-32)" id="-32">#{getGUIString -32 figs}
       <td .blueField><a href="javascript:makeMove(-33)" id="-33">#{getGUIString -33 figs}
+      <td .blueField><a href="javascript:makeMove(-32)" id="-32">#{getGUIString -32 figs}
     <tr>
       <td .greenField><a href="javascript:makeMove(-21)" id="-21">#{getGUIString -21 figs}
       <td .greenField><a href="javascript:makeMove(-20)" id="-20">#{getGUIString -20 figs}
@@ -123,8 +127,8 @@
       <td>  
       <td> 
     <tr>
-      <td .yellowField #><a href="javascript:makeMove(-12)" id="-12">#{getGUIString -12 figs}
       <td .yellowField #><a href="javascript:makeMove(-13)" id="-13">#{getGUIString -13 figs}
+      <td .yellowField #><a href="javascript:makeMove(-12)" id="-12">#{getGUIString -12 figs}
       <td>
       <td>
       <td .standardField><a href="javascript:makeMove(1)" id="1">#{getGUIString 1 figs}
@@ -132,8 +136,8 @@
       <td .standardField><a href="javascript:makeMove(49)" id="49">#{getGUIString 49 figs}
       <td> 
       <td> 
-      <td .redField><a href="javascript:makeMove(-42)" id="-42">#{getGUIString -42 figs}
       <td .redField><a href="javascript:makeMove(-43)" id="-43">#{getGUIString -43 figs}
+      <td .redField><a href="javascript:makeMove(-42)" id="-42">#{getGUIString -42 figs}
     <tr>
       <td .yellowField><a href="javascript:makeMove(-11)" id="-11">#{getGUIString -11 figs}
       <td .yellowField><a href="javascript:makeMove(-10)" id="-10">#{getGUIString -10 figs}

@@ -45,9 +45,9 @@ getGameR gameID = do
                      in do liftIO $ atomically $ writeTVar (games master) newGameList
                 else do liftIO $ Prelude.putStrLn "Spieler nicht am Zug"
             defaultLayout $ do
-                let diceRes = if oldBS^.diceResult == 0 
-                                then if isTurnOfClient then show newDice else "___"
-                                else show (oldBS^.diceResult)
+                let (hasToDice, diceRes) = if oldBS^.diceResult == 0 
+                                            then (True, show newDice) 
+                                            else (False, show (oldBS^.diceResult))
                     ownColor = snd $ head $ filter (\x -> fst x == (fromJust csrfToken)) (gameInfo^.colorMap)
                 setTitle "Mensch ärgere Dich nicht"
                 $(widgetFile "gamepage")
@@ -69,7 +69,6 @@ postGameR gameID = do
                 newBS = if (isClientsTurn csrfToken gameInfo)
                             then moveFigure (moveDataToFigure moveData) oldBS
                             else oldBS
-                -- newBS = moveFigure (moveDataToFigure moveData) oldBS :: BoardState
             liftIO $ Prelude.putStrLn (show newBS)
             let newGameList = if isGameOver $ newBS^.figures
                     then filter (\x -> _lobbyId x /= gameID) gameList 
