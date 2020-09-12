@@ -7,6 +7,7 @@
 {-# LANGUAGE TypeFamilies #-}
 module Handler.Game where
 import Data.Aeson
+import Data.Maybe
 import GHC.Generics
 import Import hiding (map, head, elem, fst, snd, filter, atomically, readTVarIO, writeTVar, (++), (.))
 import Text.Julius (RawJS (..))
@@ -47,6 +48,7 @@ getGameR gameID = do
                 let diceRes = if oldBS^.diceResult == 0 
                                 then if isTurnOfClient then show newDice else "___"
                                 else show (oldBS^.diceResult)
+                    ownColor = snd $ head $ filter (\x -> fst x == (fromJust csrfToken)) (gameInfo^.colorMap)
                 setTitle "Mensch ärgere Dich nicht"
                 $(widgetFile "gamepage")
         else 
