@@ -50,8 +50,8 @@ isValidAction (Figure color1 currentField1) (BoardState figures1 _ 6) =
 -- cannot move Start figure if count not six
 isValidAction (Figure _ Start) _ = False
 -- other moves
-isValidAction (Figure color1 currentField1) (BoardState figures1 _ _) =
-  if not (isMovingFirstIfNeeded (Figure color1 currentField1) figures1)
+isValidAction (Figure color1 currentField1) (BoardState figures1 _ diceRes) =
+  if not (isMovingFirstIfNeeded (Figure color1 currentField1) figures1 diceRes)
     then False
     else True
 
@@ -60,18 +60,22 @@ isTurnOfColor :: Color -> Color -> Bool
 isTurnOfColor color1 turn1 = turn1 == color1
 
 -- Wenn First von eigener Figur belegt und noch mind 1 Figur im Start: Muss Figur von First wegbewegen
-isMovingFirstIfNeeded :: Figure -> [Figure] -> Bool
-isMovingFirstIfNeeded (Figure color1 (First x)) figures1 = 
+isMovingFirstIfNeeded :: Figure -> [Figure] -> Int -> Bool
+isMovingFirstIfNeeded (Figure color1 (First x)) figures1 diceRes = 
   if x == getBoardOffset color1
     then True
     else not (elem (Figure color1 (First (getBoardOffset color1))) figures1 && (hasStartFigures color1 figures1))
-isMovingFirstIfNeeded (Figure color1 _) figures1 = 
+      || elem (Figure color1 (Standard ((getBoardOffset color1)+diceRes))) figures1
+isMovingFirstIfNeeded (Figure color1 _) figures1 diceRes = 
   not (elem (Figure color1 (First (getBoardOffset color1))) figures1 && (hasStartFigures color1 figures1))
+    || elem (Figure color1 (Standard ((getBoardOffset color1)+diceRes))) figures1
 
 -- Wenn sechs gewürfelt und noch mind 1 Figur im Start: Figur aufs Spielbrett bewegen
 isInsertingNewFigureIfNeeded :: Figure -> [Figure] -> Bool
-isInsertingNewFigureIfNeeded (Figure _ Start)    _        = True
-isInsertingNewFigureIfNeeded (Figure color1 _)   figures1 = not (hasStartFigures color1 figures1)
+isInsertingNewFigureIfNeeded (Figure _ Start)              _        = True
+isInsertingNewFigureIfNeeded (Figure color1 currentField1) figures1 =
+  not (hasStartFigures color1 figures1) || currentField1 == First (getBoardOffset color1) 
+  || (elem (Figure color1 (Standard ((getBoardOffset color1)+6))) figures1 && elem (Figure color1 (First (getBoardOffset color1))) figures1)
 
 hasStartFigures :: Color -> [Figure] -> Bool
 hasStartFigures color1 figures1 = elem (Figure color1 Start) figures1
