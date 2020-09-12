@@ -25,5 +25,5 @@ ip-from-header: "_env:YESOD_IP_FROM_HEADER:false"
 # mutable-static: false
 # skip-combining: false
 
-copyright: Lebenswerk von Florian Klement, in Erinnerung an Josef Friedrich Schmidt
+copyright: Florian Klement, Stefanie Kloss
 #analytics: UA-YOURCODE
