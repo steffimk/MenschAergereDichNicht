@@ -15,7 +15,6 @@ import Import.NoFoundation
 import Model.Board
 import Model.LobbyModel
 import Control.Concurrent.STM
-import Control.Monad.Logger        (LogSource)
 import Text.Hamlet                 (hamletFile)
 import Text.Jasmine                (minifym)
 import Yesod.Core.Types            (Logger)

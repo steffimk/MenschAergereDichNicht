@@ -17,3 +17,13 @@ li {
     joinButton.innerHTML: "Join";
     joinButton.style.background: '#008000';
 }
+
+.joinButton {
+    color: white;
+    background: #008000;
+}
+
+.leaveButton {
+    color: white;
+    background: #800000;
+}
