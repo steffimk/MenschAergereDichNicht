@@ -1,3 +1,4 @@
 <div>
   <h1>Mensch ärgere Dich nicht
-  <h2>Warte auf deine Mitspieler
+  <h4>Hier findet gerade kein Spiel statt.
+  <a href=@{HomeR}>Zur Startseite!

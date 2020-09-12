@@ -30,20 +30,23 @@ getGameR :: String -> Handler Html
 getGameR gameID = do
     master <- getYesod
     gameList <- liftIO $ Control.Concurrent.STM.readTVarIO $ games master
+    csrfToken <- lookupCookie $ TE.decodeUtf8 defaultCsrfCookieName :: Handler (Maybe Text)
     if elem gameID (map _lobbyId gameList)
         then do
             newDice <- liftIO $ rollTheDice
             let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
                 oldBS = gameInfo^.boardState :: BoardState
-                dice = if oldBS^.diceResult > 0 then oldBS^.diceResult else newDice
                 figs = oldBS^.figures
-            if oldBS^.diceResult == 0
-                then let newGameInfo = set (boardState.diceResult) dice gameInfo
+                isTurnOfClient = isClientsTurn csrfToken gameInfo
+            if oldBS^.diceResult == 0 && isTurnOfClient
+                then let newGameInfo = set (boardState.diceResult) newDice gameInfo
                          newGameList = (:) newGameInfo (filter (\x -> _lobbyId x /= gameID) gameList)
                      in do liftIO $ atomically $ writeTVar (games master) newGameList
-                else do return ()
+                else do liftIO $ Prelude.putStrLn "Spieler nicht am Zug"
             defaultLayout $ do
-                let diceRes = show $ dice
+                let diceRes = if oldBS^.diceResult == 0 
+                                then if isTurnOfClient then show newDice else "___"
+                                else show (oldBS^.diceResult)
                 setTitle "Mensch ärgere Dich nicht"
                 $(widgetFile "gamepage")
         else 
@@ -62,8 +65,8 @@ postGameR gameID = do
             let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
                 oldBS = _boardState gameInfo :: BoardState
                 newBS = if (isClientsTurn csrfToken gameInfo)
-                                    then moveFigure (moveDataToFigure moveData) oldBS
-                                    else oldBS
+                            then moveFigure (moveDataToFigure moveData) oldBS
+                            else oldBS
                 -- newBS = moveFigure (moveDataToFigure moveData) oldBS :: BoardState
             liftIO $ Prelude.putStrLn (show newBS)
             let newGameList = (:) (set boardState newBS gameInfo) (filter (\x -> _lobbyId x /= gameID) gameList) 
@@ -73,6 +76,6 @@ postGameR gameID = do
 
 isClientsTurn :: (Maybe Text) -> GameInfo -> Bool
 isClientsTurn Nothing      _                                = False
-isClientsTurn (Just token) (GameInfo _ boardState1 colorMap) = 
-    let turnToken = fst $ head $ filter (\x -> snd x == _turn boardState1) colorMap
+isClientsTurn (Just token) (GameInfo _ boardState1 colorMap1) = 
+    let turnToken = fst $ head $ filter (\x -> snd x == _turn boardState1) colorMap1
     in turnToken == token
