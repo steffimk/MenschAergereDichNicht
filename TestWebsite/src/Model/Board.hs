@@ -32,7 +32,7 @@ initNewBoardState :: BoardState
 initNewBoardState = BoardState ((initFigures Yellow)++(initFigures Green)++(initFigures Blue)++(initFigures Red)) Yellow 0
 
 initFigures :: Color -> [Figure]
-initFigures color1 = [Figure color1 Start | _ <- [0..3]]
+initFigures color1 = (Figure color1 (First (getBoardOffset color1))) : [Figure color1 Start | _ <- [0..2]]
 
 getBoardOffset :: Color -> Int
 getBoardOffset color1 = 

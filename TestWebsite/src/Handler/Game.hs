@@ -35,7 +35,7 @@ getGameR gameID = do
             newDice <- liftIO $ rollTheDice
             let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
                 oldBS = gameInfo^.boardState :: BoardState
-                dice = if oldBS^.diceResult > 0 then oldBS^.diceResult else 6
+                dice = if oldBS^.diceResult > 0 then oldBS^.diceResult else newDice
                 figs = oldBS^.figures
             if oldBS^.diceResult == 0
                 then let newGameInfo = set (boardState.diceResult) dice gameInfo
