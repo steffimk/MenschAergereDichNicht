@@ -45,9 +45,7 @@ getGameR gameID = do
                      in do liftIO $ atomically $ writeTVar (games master) newGameList
                 else do liftIO $ Prelude.putStrLn "Spieler nicht am Zug"
             defaultLayout $ do
-                let diceRes = if oldBS^.diceResult == 0 
-                                then if isTurnOfClient then show newDice else "___"
-                                else show (oldBS^.diceResult)
+                let diceRes = if oldBS^.diceResult == 0 then show newDice else show (oldBS^.diceResult)
                     ownColor = snd $ head $ filter (\x -> fst x == (fromJust csrfToken)) (gameInfo^.colorMap)
                 setTitle "Mensch ärgere Dich nicht"
                 $(widgetFile "gamepage")
