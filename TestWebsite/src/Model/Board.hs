@@ -33,6 +33,10 @@ initNewBoardState = BoardState ((initFigures Yellow)++(initFigures Green)++(init
 
 initFigures :: Color -> [Figure]
 initFigures color1 = (Figure color1 (First (getBoardOffset color1))) : [Figure color1 Start | _ <- [0..2]]
+-- initFigures Yellow = [(Figure Yellow (Standard 51)), (Figure Yellow (Home 53)), (Figure Yellow (Home 54)), (Figure Yellow (Home 55))]
+-- initFigures Green = [(Figure Green (Home 10)), (Figure Green (Home 11)), (Figure Green (Home 12)), (Figure Green (Home 13))]
+-- initFigures Blue = [(Figure Blue (Home 24)), (Figure Blue (Home 25)), (Figure Blue (Home 26)), (Figure Blue (Home 27))]
+-- initFigures Red = [(Figure Red (Home 38)), (Figure Red (Home 39)), (Figure Red (Home 40)), (Figure Red (Home 41))]
 
 getBoardOffset :: Color -> Int
 getBoardOffset color1 = 
@@ -74,10 +78,10 @@ setToFreshTurn boardState = set turn (nextTurn boardState) (set diceResult 0 boa
 
 nextTurn :: BoardState -> Color
 nextTurn (BoardState _        color1 6) = color1   
-nextTurn (BoardState figures1 Yellow _) = getNextColor figures1 [Green ..]
-nextTurn (BoardState figures1 Green  _) = getNextColor figures1 [Blue, Red, Yellow]
-nextTurn (BoardState figures1 Blue   _) = getNextColor figures1 [Red, Yellow, Green]
-nextTurn (BoardState figures1 Red    _) = getNextColor figures1 [Yellow, Green, Blue]
+nextTurn (BoardState figures1 Yellow _) = getNextColor figures1 [Green, Blue, Red, Yellow]
+nextTurn (BoardState figures1 Green  _) = getNextColor figures1 [Blue, Red, Yellow, Green]
+nextTurn (BoardState figures1 Blue   _) = getNextColor figures1 [Red, Yellow, Green, Blue]
+nextTurn (BoardState figures1 Red    _) = getNextColor figures1 [Yellow ..]
 
 getNextColor :: [Figure] -> [Color] -> Color
 getNextColor figures1 colors =
@@ -85,6 +89,9 @@ getNextColor figures1 colors =
   in if null colorsInGame
        then Yellow -- TODO: Game Ended
        else head colorsInGame
+
+isGameOver :: [Figure] -> Bool
+isGameOver figures1 = foldl (&&) True (map (\x -> hasFinishedGame figures1 x) [Yellow ..])
 
 hasFinishedGame :: [Figure] -> Color -> Bool
 hasFinishedGame figures1 color1 = foldl (&&) True (map isFigureHome [f | f <- figures1, (_color f) == color1])

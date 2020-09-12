@@ -1,4 +1,4 @@
 <div>
   <h1>Mensch ärgere Dich nicht
-  <h4>Hier findet gerade kein Spiel statt.
-  <a href=@{HomeR}>Zur Startseite!
+  <h4>Dieses Spiel ist beendet.
+  <a href=@{HomeR}>Hier geht's zurück zur Startseite!

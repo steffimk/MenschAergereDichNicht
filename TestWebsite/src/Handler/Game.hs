@@ -69,7 +69,9 @@ postGameR gameID = do
                             else oldBS
                 -- newBS = moveFigure (moveDataToFigure moveData) oldBS :: BoardState
             liftIO $ Prelude.putStrLn (show newBS)
-            let newGameList = (:) (set boardState newBS gameInfo) (filter (\x -> _lobbyId x /= gameID) gameList) 
+            let newGameList = if isGameOver $ newBS^.figures
+                    then filter (\x -> _lobbyId x /= gameID) gameList 
+                    else (:) (set boardState newBS gameInfo) (filter (\x -> _lobbyId x /= gameID) gameList) 
             liftIO $ atomically $ writeTVar (games master) newGameList
             returnJson moveData
         else returnJson moveData
@@ -79,3 +81,10 @@ isClientsTurn Nothing      _                                = False
 isClientsTurn (Just token) (GameInfo _ boardState1 colorMap1) = 
     let turnToken = fst $ head $ filter (\x -> snd x == _turn boardState1) colorMap1
     in turnToken == token
+
+-- if isGameOver $ gameInfo^.boardState.figures
+--     then do
+--         liftIO $ atomically $ writeTVar $ filter (\x -> _lobbyId x /= gameID) gameList
+--         defaultLayout $ do
+--             setTitle "Mensch ärgere Dich nicht"
+--             $(widgetFile "waitpage")
