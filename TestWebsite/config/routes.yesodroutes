@@ -19,3 +19,7 @@
 /join_lobby JoinLobbyR POST
 
 /leave_lobby LeaveLobbyR POST
+
+/lobby_or_game_exists/#String LobbyOrGameExistsR GET
+
+/player_has_game PlayersGameIdR GET
