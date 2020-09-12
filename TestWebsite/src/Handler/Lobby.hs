@@ -23,23 +23,27 @@ postLobbyCreationR = do
     -- requireCheckJsonBody will parse the request body into the appropriate type, or return a 400 status code if the request JSON is invalid.
     lobby <- requireCheckJsonBody :: Handler Lobby
     master <- getYesod
-    openLobbies <- liftIO $ readTVarIO $ openLobbiesMaster master
-    openGames <- liftIO $ readTVarIO $ games master
-    let player_token = (Prelude.head (player_tokens lobby))
-        lobbyToJoin = lobbyname lobby
-        openLobbiesPlayerRemoved = addPtToLobbyAndRemoveFromOthers player_token lobbyToJoin openLobbies openGames
-        newOpenLobbies = openLobbiesPlayerRemoved Data.List.++ [lobby]
-    liftIO $ Prelude.putStrLn ("adding new lobby: " Data.List.++ show lobby)
-    liftIO $ atomically $ writeTVar (openLobbiesMaster master) newOpenLobbies
+    atomically (
+        do
+        openLobbies <- readTVar $ openLobbiesMaster master
+        openGames <- readTVar $ games master
+        let player_token = (Prelude.head (player_tokens lobby))
+            lobbyToJoin = lobbyname lobby
+            openLobbiesPlayerRemoved = addPtToLobbyAndRemoveFromOthers player_token lobbyToJoin openLobbies openGames
+            newOpenLobbies = openLobbiesPlayerRemoved Data.List.++ [lobby]
+        writeTVar (openLobbiesMaster master) newOpenLobbies
 
-    returnJson lobby
+        returnJson lobby
+        )
 
 getOpenLobbiesR :: Handler Value
 getOpenLobbiesR = do
     master <- getYesod
-    openLobbies <- liftIO $ readTVarIO $ openLobbiesMaster master
-    liftIO $ Prelude.putStrLn ("open lobbies: " Data.List.++ show openLobbies)
-    returnJson openLobbies
+    atomically (
+        do
+        openLobbies <- readTVar $ openLobbiesMaster master
+        returnJson openLobbies
+        )
 
 rmPtFromLobbies :: CSRF_Token -> [Lobby] -> [Lobby]
 rmPtFromLobbies pt lobbies =
@@ -68,28 +72,31 @@ postJoinLobbyR :: Handler Value
 postJoinLobbyR = do
     lobbyToJoin <- requireCheckJsonBody :: Handler LobbyToJoin
     master <- getYesod
-    openLobbies <- liftIO $ readTVarIO $ openLobbiesMaster master
-    openGames <- liftIO $ readTVarIO $ games master
     token <- lookupCookie "XSRF-TOKEN"
+    atomically (
+        do
+        openLobbies <- readTVar $ openLobbiesMaster master
+        openGames <- readTVar $ games master
 
-    -- if doesGameWithPlayerExist token openGames
-    --     then returnJson LobbyToJoin { lobbynameToJoin="", players_token="" }
-    --     else do
+        -- if doesGameWithPlayerExist token openGames
+        --     then returnJson LobbyToJoin { lobbynameToJoin="", players_token="" }
+        --     else do
 
-    let newLobbies = addPtToLobbyAndRemoveFromOthers (players_token lobbyToJoin) (lobbynameToJoin lobbyToJoin) openLobbies openGames
+        let newLobbies = addPtToLobbyAndRemoveFromOthers (players_token lobbyToJoin) (lobbynameToJoin lobbyToJoin) openLobbies openGames
 
-    case (Data.List.find (\l -> (lobbyname l)==(lobbynameToJoin lobbyToJoin)) newLobbies) of
-        Nothing -> liftIO $ atomically $ writeTVar (openLobbiesMaster master) newLobbies
-        Just lobby -> case shouldLobbyBeConvertedToGame lobby of
-            False -> liftIO $ atomically $ writeTVar (openLobbiesMaster master) newLobbies
-            True  -> let lobbies = (Data.List.filter (\l -> (lobbyname l)/=(lobbynameToJoin lobbyToJoin)) newLobbies)
-                         newOpenGame = convertLobbyToGame (Prelude.head (Data.List.filter (\l -> (lobbyname l)==(lobbynameToJoin lobbyToJoin)) newLobbies))
-                     in do { liftIO $ atomically $ writeTVar (openLobbiesMaster master) lobbies;
-                             liftIO $ atomically $ writeTVar (games master) (openGames Data.List.++ [newOpenGame]) }
+        case (Data.List.find (\l -> (lobbyname l)==(lobbynameToJoin lobbyToJoin)) newLobbies) of
+            Nothing -> writeTVar (openLobbiesMaster master) newLobbies
+            Just lobby -> case shouldLobbyBeConvertedToGame lobby of
+                False -> writeTVar (openLobbiesMaster master) newLobbies
+                True  -> let lobbies = (Data.List.filter (\l -> (lobbyname l)/=(lobbynameToJoin lobbyToJoin)) newLobbies)
+                             newOpenGame = convertLobbyToGame (Prelude.head (Data.List.filter (\l -> (lobbyname l)==(lobbynameToJoin lobbyToJoin)) newLobbies))
+                        in do { writeTVar (openLobbiesMaster master) lobbies;
+                                writeTVar (games master) (openGames Data.List.++ [newOpenGame]) }
 
-    case (doesLobbyWithPlayerExist (players_token lobbyToJoin) (lobbynameToJoin lobbyToJoin) newLobbies) || (not (doesGameWithPlayerExist token openGames)) of
-        True -> returnJson lobbyToJoin
-        _    -> returnJson LobbyToJoin { lobbynameToJoin="", players_token="" }
+        case (doesLobbyWithPlayerExist (players_token lobbyToJoin) (lobbynameToJoin lobbyToJoin) newLobbies) || (not (doesGameWithPlayerExist token openGames)) of
+            True -> returnJson lobbyToJoin
+            _    -> returnJson LobbyToJoin { lobbynameToJoin="", players_token="" }
+        )
 
 -- getLobbyFromMaybeLobby :: Maybe Lobby -> Lobby
 
@@ -132,39 +139,47 @@ postLeaveLobbyR :: Handler Value
 postLeaveLobbyR = do
     lobbyToLeave <- requireCheckJsonBody :: Handler LobbyToLeave
     master <- getYesod
-    openLobbies <- liftIO $ readTVarIO $ openLobbiesMaster master
-    openGames <- liftIO $ readTVarIO $ games master
     token <- lookupCookie "XSRF-TOKEN"
-    let newLobbies = rmPtFromLobbies (leaving_players_token lobbyToLeave) openLobbies
-    liftIO $ Prelude.putStrLn ("leaving lobby: " Data.List.++ show lobbyToLeave)
-    liftIO $ atomically $ writeTVar (openLobbiesMaster master) newLobbies
+    atomically (
+        do
+        openLobbies <- readTVar $ openLobbiesMaster master
+        openGames <- readTVar $ games master
+        let newLobbies = rmPtFromLobbies (leaving_players_token lobbyToLeave) openLobbies
+        writeTVar (openLobbiesMaster master) newLobbies
 
-    case doesLobbyWithPlayerExist (leaving_players_token lobbyToLeave) (lobbynameToLeave lobbyToLeave) newLobbies of
-        True -> returnJson LobbyToLeave { lobbynameToLeave="", leaving_players_token="" }
-        _    -> case playersGameId token openGames of
-                    Just _  -> returnJson LobbyToLeave { lobbynameToLeave="", leaving_players_token="" }
-                    Nothing -> returnJson lobbyToLeave
+        case doesLobbyWithPlayerExist (leaving_players_token lobbyToLeave) (lobbynameToLeave lobbyToLeave) newLobbies of
+            True -> returnJson LobbyToLeave { lobbynameToLeave="", leaving_players_token="" }
+            _    -> case playersGameId token openGames of
+                        Just _  -> returnJson LobbyToLeave { lobbynameToLeave="", leaving_players_token="" }
+                        Nothing -> returnJson lobbyToLeave
+        )
 
 getLobbyOrGameExistsR :: String -> Handler Value
 getLobbyOrGameExistsR lnToCheckString = do
     master <- getYesod
-    openLobbies <- liftIO $ readTVarIO $ openLobbiesMaster master
-    openGames <- liftIO $ readTVarIO $ games master
+    atomically (
+        do
+        openLobbies <- readTVar $ openLobbiesMaster master
+        openGames <- readTVar $ games master
 
-    let lnToCheckText = pack' lnToCheckString
-        getLnFromOpenLobbies lobby = (lobbyname lobby)
-        getLnFromGames game = (lobbyId game)
-        in returnJson ((Prelude.elem lnToCheckText (Prelude.map getLnFromOpenLobbies openLobbies) || Prelude.elem lnToCheckString (Prelude.map getLnFromGames openGames)))
+        let lnToCheckText = pack' lnToCheckString
+            getLnFromOpenLobbies lobby = (lobbyname lobby)
+            getLnFromGames game = (lobbyId game)
+            in returnJson ((Prelude.elem lnToCheckText (Prelude.map getLnFromOpenLobbies openLobbies) || Prelude.elem lnToCheckString (Prelude.map getLnFromGames openGames)))
+        )
 
 getPlayersGameIdR :: Handler Value
 getPlayersGameIdR = do
     master <- getYesod
     token <- lookupCookie "XSRF-TOKEN"
-    openGames <- liftIO $ readTVarIO $ games master
+    atomically (
+        do
+        openGames <- readTVar $ games master
 
-    case playersGameId token openGames of
-        Nothing     -> returnJson ("" :: Text)
-        Just gameId -> returnJson gameId
+        case playersGameId token openGames of
+            Nothing     -> returnJson ("" :: Text)
+            Just gameId -> returnJson gameId
+        )
 
 playersGameId :: Maybe CSRF_Token -> [GameInfo] -> Maybe Text
 playersGameId maybeToken gamesList =
