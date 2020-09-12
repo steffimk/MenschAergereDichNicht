@@ -1,10 +1,8 @@
 <div .masthead>
     <div .container>
         <div .row>
-            <h1 .header>
-                Herzlich Willkommen zu unserem Mensch-Ärgere-Dich-Nicht
-            <h2>
-                Nice
+            <h1 .header>Herzlich Willkommen zu unserem 
+            <h1>Mensch ärgere Dich nicht
 
 <div .container>
     <div .bs-docs-section>
