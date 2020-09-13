@@ -1,0 +1,200 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 7a238c2511c214527d74eae4f53c8195e9e47773553a2e4684bd5bdf840297a4
+
+name:           TestWebsite
+version:        0.0.0
+build-type:     Simple
+
+flag dev
+  description: Turn on development settings, like auto-reload templates.
+  manual: False
+  default: False
+
+flag library-only
+  description: Build for use with "yesod devel"
+  manual: False
+  default: False
+
+library
+  exposed-modules:
+      Application
+      Controller.Actions
+      Foundation
+      Handler.Comment
+      Handler.Common
+      Handler.Game
+      Handler.Home
+      Handler.Lobby
+      Import
+      Import.NoFoundation
+      Model.Board
+      Model.LobbyModel
+      Settings
+      Settings.StaticFiles
+  other-modules:
+      Paths_TestWebsite
+  hs-source-dirs:
+      src
+  build-depends:
+      aeson >=1.4 && <1.5
+    , base >=4.9.1.0 && <5
+    , bytestring >=0.10 && <0.11
+    , case-insensitive
+    , classy-prelude >=1.5 && <1.6
+    , classy-prelude-conduit >=1.5 && <1.6
+    , classy-prelude-yesod >=1.5 && <1.6
+    , conduit >=1.0 && <2.0
+    , containers
+    , data-default
+    , directory >=1.1 && <1.4
+    , fast-logger >=2.2 && <3.1
+    , file-embed
+    , foreign-store
+    , hjsmin >=0.1 && <0.3
+    , http-client-tls >=0.3 && <0.4
+    , http-conduit >=2.3 && <2.4
+    , lens
+    , monad-control >=0.3 && <1.1
+    , monad-logger >=0.3 && <0.4
+    , monad-par
+    , mtl >2.2.1 && <=2.2.2
+    , random
+    , safe
+    , shakespeare >=2.0 && <2.1
+    , stm
+    , template-haskell
+    , text >=0.11 && <2.0
+    , time
+    , unordered-containers
+    , vector
+    , wai
+    , wai-extra >=3.0 && <3.1
+    , wai-logger >=2.2 && <2.4
+    , warp >=3.0 && <3.4
+    , yaml >=0.11 && <0.12
+    , yesod >=1.6 && <1.7
+    , yesod-core >=1.6 && <1.7
+    , yesod-form >=1.6 && <1.7
+    , yesod-static >=1.6 && <1.7
+  if (flag(dev)) || (flag(library-only))
+    ghc-options: -Wall -fwarn-tabs -O0
+    cpp-options: -DDEVELOPMENT
+  else
+    ghc-options: -Wall -fwarn-tabs -O2
+  default-language: Haskell2010
+
+executable TestWebsite
+  main-is: main.hs
+  other-modules:
+      DevelMain
+      Paths_TestWebsite
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      TestWebsite
+    , aeson >=1.4 && <1.5
+    , base >=4.9.1.0 && <5
+    , bytestring >=0.10 && <0.11
+    , case-insensitive
+    , classy-prelude >=1.5 && <1.6
+    , classy-prelude-conduit >=1.5 && <1.6
+    , classy-prelude-yesod >=1.5 && <1.6
+    , conduit >=1.0 && <2.0
+    , containers
+    , data-default
+    , directory >=1.1 && <1.4
+    , fast-logger >=2.2 && <3.1
+    , file-embed
+    , foreign-store
+    , hjsmin >=0.1 && <0.3
+    , http-client-tls >=0.3 && <0.4
+    , http-conduit >=2.3 && <2.4
+    , lens
+    , monad-control >=0.3 && <1.1
+    , monad-logger >=0.3 && <0.4
+    , monad-par
+    , mtl >2.2.1 && <=2.2.2
+    , random
+    , safe
+    , shakespeare >=2.0 && <2.1
+    , stm
+    , template-haskell
+    , text >=0.11 && <2.0
+    , time
+    , unordered-containers
+    , vector
+    , wai
+    , wai-extra >=3.0 && <3.1
+    , wai-logger >=2.2 && <2.4
+    , warp >=3.0 && <3.4
+    , yaml >=0.11 && <0.12
+    , yesod >=1.6 && <1.7
+    , yesod-core >=1.6 && <1.7
+    , yesod-form >=1.6 && <1.7
+    , yesod-static >=1.6 && <1.7
+  if flag(library-only)
+    buildable: False
+  default-language: Haskell2010
+
+test-suite TestWebsite-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Handler.CommonSpec
+      Handler.HomeSpec
+      TestImport
+      Paths_TestWebsite
+  hs-source-dirs:
+      test
+  ghc-options: -Wall
+  build-depends:
+      TestWebsite
+    , aeson >=1.4 && <1.5
+    , base >=4.9.1.0 && <5
+    , bytestring >=0.10 && <0.11
+    , case-insensitive
+    , classy-prelude >=1.5 && <1.6
+    , classy-prelude-conduit >=1.5 && <1.6
+    , classy-prelude-yesod >=1.5 && <1.6
+    , conduit >=1.0 && <2.0
+    , containers
+    , data-default
+    , directory >=1.1 && <1.4
+    , fast-logger >=2.2 && <3.1
+    , file-embed
+    , foreign-store
+    , hjsmin >=0.1 && <0.3
+    , hspec >=2.0.0
+    , http-client-tls >=0.3 && <0.4
+    , http-conduit >=2.3 && <2.4
+    , lens
+    , monad-control >=0.3 && <1.1
+    , monad-logger >=0.3 && <0.4
+    , monad-par
+    , mtl >2.2.1 && <=2.2.2
+    , random
+    , safe
+    , shakespeare >=2.0 && <2.1
+    , stm
+    , template-haskell
+    , text >=0.11 && <2.0
+    , time
+    , unordered-containers
+    , vector
+    , wai
+    , wai-extra >=3.0 && <3.1
+    , wai-logger >=2.2 && <2.4
+    , warp >=3.0 && <3.4
+    , yaml >=0.11 && <0.12
+    , yesod >=1.6 && <1.7
+    , yesod-core >=1.6 && <1.7
+    , yesod-form >=1.6 && <1.7
+    , yesod-static >=1.6 && <1.7
+    , yesod-test
+  default-language: Haskell2010
