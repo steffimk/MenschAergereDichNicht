@@ -5,7 +5,6 @@ module Model.LobbyModel where
 
 import ClassyPrelude.Yesod
 import Control.Lens
-import Control.Lens.TH
 import Model.Board
 
 type CSRF_Token = Text

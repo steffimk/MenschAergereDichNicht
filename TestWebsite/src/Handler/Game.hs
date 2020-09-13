@@ -30,7 +30,7 @@ moveDataToFigure (MoveData colorStr fieldNr) = Figure (stringToColor colorStr) (
 getGameR :: String -> Handler Html
 getGameR gameID = do
     master <- getYesod
-    gameList <- liftIO $ Control.Concurrent.STM.readTVarIO $ games master
+    gameList <- liftIO $ readTVarIO $ games master
     csrfToken <- lookupCookie $ TE.decodeUtf8 defaultCsrfCookieName :: Handler (Maybe Text)
     if elem gameID (map _lobbyId gameList)
         then do
@@ -40,9 +40,13 @@ getGameR gameID = do
                 figs = oldBS^.figures
                 isTurnOfClient = isClientsTurn csrfToken gameInfo
             if oldBS^.diceResult == 0 && isTurnOfClient
-                then let newGameInfo = set (boardState.diceResult) newDice gameInfo
-                         newGameList = (:) newGameInfo (filter (\x -> _lobbyId x /= gameID) gameList)
-                     in do liftIO $ atomically $ writeTVar (games master) newGameList
+                then liftIO $ atomically (
+                        do
+                        gameList2 <- readTVar $ games master
+                        let newGameInfo = set (boardState.diceResult) newDice gameInfo
+                            newGameList = (:) newGameInfo (filter (\x -> _lobbyId x /= gameID) gameList2)
+                        writeTVar (games master) newGameList
+                        )
                 else do liftIO $ Prelude.putStrLn "Spieler nicht am Zug"
             defaultLayout $ do
                 let (hasToDice, diceRes) = if oldBS^.diceResult == 0 
@@ -63,18 +67,20 @@ postGameR gameID = do
     gameList <- liftIO $ readTVarIO $ games master
     csrfToken <- lookupCookie $ TE.decodeUtf8 defaultCsrfCookieName :: Handler (Maybe Text)
     if elem gameID (map _lobbyId gameList)
-        then do
-            let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
-                oldBS = _boardState gameInfo :: BoardState
-                newBS = if (isClientsTurn csrfToken gameInfo)
-                            then moveFigure (moveDataToFigure moveData) oldBS
-                            else oldBS
-            liftIO $ Prelude.putStrLn (show newBS)
-            let newGameList = if isGameOver $ newBS^.figures
-                    then filter (\x -> _lobbyId x /= gameID) gameList 
-                    else (:) (set boardState newBS gameInfo) (filter (\x -> _lobbyId x /= gameID) gameList) 
-            liftIO $ atomically $ writeTVar (games master) newGameList
-            returnJson moveData
+        then let gameInfo = head $ filter (\x -> _lobbyId x == gameID) gameList :: GameInfo
+             in if isClientsTurn csrfToken gameInfo
+                  then do 
+                    let oldBS = _boardState gameInfo :: BoardState
+                        newBS = moveFigure (moveDataToFigure moveData) oldBS
+                    liftIO $ atomically (
+                        do
+                        gameList2 <- readTVar $ games master
+                        let newGameList = if isGameOver $ newBS^.figures
+                            then filter (\x -> _lobbyId x /= gameID) gameList2 
+                            else (:) (set boardState newBS gameInfo) (filter (\x -> _lobbyId x /= gameID) gameList2)
+                        writeTVar (games master) newGameList)
+                    returnJson moveData
+                  else returnJson moveData
         else returnJson moveData
 
 isClientsTurn :: (Maybe Text) -> GameInfo -> Bool
@@ -82,10 +88,3 @@ isClientsTurn Nothing      _                                = False
 isClientsTurn (Just token) (GameInfo _ boardState1 colorMap1) = 
     let turnToken = fst $ head $ filter (\x -> snd x == _turn boardState1) colorMap1
     in turnToken == token
-
--- if isGameOver $ gameInfo^.boardState.figures
---     then do
---         liftIO $ atomically $ writeTVar $ filter (\x -> _lobbyId x /= gameID) gameList
---         defaultLayout $ do
---             setTitle "Mensch ärgere Dich nicht"
---             $(widgetFile "waitpage")
